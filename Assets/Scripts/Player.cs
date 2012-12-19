@@ -9,7 +9,7 @@ public class Player : MonoBehaviour {
 	// Variables
 	public LinkedList<InputEvent> inputEvents;
 	public GameManager manager;
-	public List<Tail> tails;
+	public List<GameObject> tails;
 	
 	// Keyconfig
 	public KeyCode[] keyCodes;
@@ -19,18 +19,18 @@ public class Player : MonoBehaviour {
 	 * 
 	 */
 	public void SetKeyCodes(KeyCode left, KeyCode right, KeyCode brake, KeyCode speed, KeyCode powerup) {
-		keyCodes = new KeyCode[keyCodeIndex.Size];
-		keyCodes[keyCodeIndex.Brake] = brake;
-		keyCodes[keyCodeIndex.Speed] = speed;
-		keyCodes[keyCodeIndex.Powerup] = powerup;
-		keyCodes[keyCodeIndex.Left] = left;
-		keyCodes[keyCodeIndex.Right] = right;
+		keyCodes = new KeyCode[(int)keyCodeIndex.Size];
+		keyCodes[(int)keyCodeIndex.Brake] = brake;
+		keyCodes[(int)keyCodeIndex.Speed] = speed;
+		keyCodes[(int)keyCodeIndex.Powerup] = powerup;
+		keyCodes[(int)keyCodeIndex.Left] = left;
+		keyCodes[(int)keyCodeIndex.Right] = right;
 	}
 	
 	// Use this for initialization
 	void Start () {
 		// Init Lists
-		tails = new List<Tail>();
+		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
 		
 	}
@@ -45,7 +45,7 @@ public class Player : MonoBehaviour {
 	
 	void DoInput() {
 		while(inputEvents.Count>0) {
-			InputEvent e = inputEvents.First;
+			InputEvent e = inputEvents.First.Value;
 			inputEvents.RemoveFirst();
 			
 			//TODO apply event
