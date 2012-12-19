@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour {
 	
 	//Prefabs
-	public Player playerPrefab;
+	public GameObject playerPrefab;
 	
 	public List<Player> players;
 	

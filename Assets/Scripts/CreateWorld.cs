@@ -75,11 +75,15 @@ public class CreateWorld : MonoBehaviour {
 			KeyCode left, right, brake,speed,power;
 			manager.numPlayers = playerCount;
 			manager.Start();
+			int i = 0;
 			foreach(Player p in manager.players) {
-				left = (KeyCode) Enum.Parse(KeyCode,keyLeft[i]);
-				right = (KeyCode) Enum.Parse(KeyCode,keyRight[i]);
-				brake = (KeyCode) Enum.Parse(KeyCode,keyBrake[i]);
+				left = (KeyCode) Enum.Parse(typeof(KeyCode),keyLeft[i]);
+				right = (KeyCode) Enum.Parse(typeof(KeyCode),keyRight[i]);
+				brake = (KeyCode) Enum.Parse(typeof(KeyCode),keyBrake[i]);
+				speed = (KeyCode) Enum.Parse(typeof(KeyCode),keySpeed[i]);
+				power = (KeyCode) Enum.Parse(typeof(KeyCode),keyPower[i]);
 				p.SetKeyCodes(left,right,brake,speed,power);
+				i++;
 			}
 			//TODO: start game
 		}    
