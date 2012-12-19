@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour {
 	 */
 	void Start () {
 		//reset lists
-		tails = new List<GameObject>();
 		if(players==null) {
 			players = new List<Player>();	
 		}
