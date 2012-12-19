@@ -1,8 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class CreateWorld : MonoBehaviour {
 	//GAME
+	public GameManager manager;
 	public GameObject planeFloor, planeLeft, planeRight, planeFront, planeBack;
 	public GameObject prefabPlane;
 	//GUI
@@ -12,7 +14,7 @@ public class CreateWorld : MonoBehaviour {
 	//DATA
 	// Use this for initialization
 	void Start () {
-		windowRect = new Rect(Camera.main.pixelWidth/2-150, Camera.main.pixelHeight/2-250, 300, 400);
+		windowRect = new Rect(Camera.main.pixelWidth/2-150, Camera.main.pixelHeight/2-250, 500, 500);
 		createArena();
 	}
 	
@@ -48,6 +50,11 @@ public class CreateWorld : MonoBehaviour {
 		windowRect = GUI.Window (0, windowRect, WindowFunction, "Setting");
 	}
 	void WindowFunction (int windowID) {
+		string[] keyLeft = new string[maxplayers];
+		string[] keyRight  = new string[maxplayers];
+		string[] keyBrake = new string[maxplayers];
+		string[] keySpeed = new string[maxplayers];
+		string[] keyPower = new string[maxplayers];
 		// how many player?
 		GUI.Label (new Rect (10, 20, 180, 20), "How many players (Max. 10)?");
 		playerCount = int.Parse(GUI.TextField(new Rect(185, 20, 50, 20), playerCount.ToString(), 2));		
@@ -56,15 +63,24 @@ public class CreateWorld : MonoBehaviour {
 				playerCount = maxplayers;
 		}
 		for(int i = 0;i<playerCount;i++) {
-			string keyLeft,keyRight,keyBrake;
 			//TODO: allow the players to change their names
 			GUI.Label (new Rect (10, 50+i*30, 150, 20), "Keys for player " + (i+1).ToString()+":");
-			keyLeft = GUI.TextField(new Rect(120, 50+i*30, 50, 20), "", 10);		
-			keyRight = GUI.TextField(new Rect(180, 50+i*30, 50, 20), "", 10);		
-			keyBrake = GUI.TextField(new Rect(240, 50+i*30, 50, 20), "", 10);
-			//TODO: save keys into gamemanager
+			keyLeft[i] = GUI.TextField(new Rect(120, 50+i*30, 50, 20), "", 15);		
+			keyRight[i] = GUI.TextField(new Rect(180, 50+i*30, 50, 20), "", 15);		
+			keyBrake[i] = GUI.TextField(new Rect(240, 50+i*30, 50, 20), "", 15);
+			keySpeed[i] = GUI.TextField(new Rect(300, 50+i*30, 50, 20), "", 15);		
+			keyPower[i] = GUI.TextField(new Rect(360, 50+i*30, 50, 20), "", 15);
 		}
 		if (GUI.Button(new Rect(100, 50+30*playerCount, 100, 30), "Start")) {
+			KeyCode left, right, brake,speed,power;
+			manager.numPlayers = playerCount;
+			manager.Start();
+			foreach(Player p in manager.players) {
+				left = (KeyCode) Enum.Parse(KeyCode,keyLeft[i]);
+				right = (KeyCode) Enum.Parse(KeyCode,keyRight[i]);
+				brake = (KeyCode) Enum.Parse(KeyCode,keyBrake[i]);
+				p.SetKeyCodes(left,right,brake,speed,power);
+			}
 			//TODO: start game
 		}    
 	}

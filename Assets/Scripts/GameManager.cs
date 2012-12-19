@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour {
 	 * New Level: first call start.
 	 * Now, give the players their keyCodes (Player.SetKeyCodes())
 	 */
-	void Start () {
+	public void Start () {
 		//reset lists
 		tails = new List<GameObject>();
 		if(players==null) {

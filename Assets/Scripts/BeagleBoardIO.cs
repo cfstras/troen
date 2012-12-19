@@ -6,7 +6,7 @@ using System;
 public class BeagleBoardIO {
 	SerialPort stream = new SerialPort("COM3");
 	public string receivedData = "EMPTY";
-	static IO instance;
+	static BeagleBoardIO instance;
 	
 	//DATA
 	//buttons
@@ -53,9 +53,9 @@ public class BeagleBoardIO {
 		return 1 - (value-froma)*(tob-toa)/(float)(fromb-froma);
 	}
 	//singleton
-	public static IO getInstance() {
+	public static BeagleBoardIO getInstance() {
 		if(instance == null) {
-			instance = new IO();
+			instance = new BeagleBoardIO();
 		} 
 		return instance;
 	}
