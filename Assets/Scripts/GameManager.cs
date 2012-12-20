@@ -9,26 +9,38 @@ public class GameManager : MonoBehaviour {
 	public List<Player> players;
 	
 	//Settings
-	public int numPlayers = 2;
+	public int numPlayers = 0;
 	
-	/**
-	 * New Level: first call start.
-	 * Now, give the players their keyCodes (Player.SetKeyCodes())
-	 */
-	public void Start () {
+	void Start () {
 		//reset lists
 		if(players==null) {
 			players = new List<Player>();	
 		}
 		
-		//create/get player instances
-		if(numPlayers != players.Count) {
-			players.Clear();
-			for(int i=0;i<numPlayers;i++) {
-				Player p = (Player)Instantiate (playerPrefab);
-				p.manager = this;
-				players.Add (p);	
-			}
+		//delete old players
+		foreach (Player p in players)
+		{
+			Destroy(p);
+		}
+		players.Clear();
+		
+		
+	}
+	
+	/**
+	 * New Level: first call StartGame.
+	 * Now, give the players their keyCodes (Player.SetKeyCodes())
+	 */
+	public void StartGame(int numPlayers) {
+		this.numPlayers = numPlayers;
+		Start();
+		
+		//create player instances
+		for(int i=0;i<numPlayers;i++) {
+			GameObject po = (GameObject)Instantiate (playerPrefab);
+			Player p = (Player) po.GetComponent(typeof(Player));
+			p.manager = this;
+			players.Add (p);	
 		}
 		
 		//TODO reset positions
@@ -36,19 +48,20 @@ public class GameManager : MonoBehaviour {
 		//TODO start overlay with countdown
 		
 		//TODO freeze time until UnPause()
-		
 	}
 	
 	/**
 	 * Unpauses the game
 	 */
-	void UnPause() {
+	public void UnPause() {
 		//TODO
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		DoInput();
+		//check for dead players
+		//do something?
 	}
 	
 	void DoInput() {
