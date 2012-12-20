@@ -1,4 +1,4 @@
-troen
+TRØN
 =====
 
-TRØN - a multiplayer armagetron clone with unity and IMGE-I-PCB
+a multiplayer tron clone with unity and IMGE-I-PCB
