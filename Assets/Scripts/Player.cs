@@ -6,8 +6,9 @@ public class Player : MonoBehaviour {
 	//constants
 	public const float playerHeight = 0.5f;
 	public const float turnDeadZone = 0.05f;
-	public const float playerSpeed = 1.0f;
+	public const float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
+	public const float tailFallSpeed = 0.5f;
 	
 	// Prefabs
 	public GameObject tailPrefab;
@@ -22,6 +23,8 @@ public class Player : MonoBehaviour {
 	private float headTurnValue;
 	
 	public List<GameObject> tails;
+	public GameObject lastTail;
+	private Vector3 lastTailStartPos;
 	
 	public Orientation orientation;
 	public float speed;
@@ -62,6 +65,7 @@ public class Player : MonoBehaviour {
 			head = headTrans.gameObject;
 		}
 		headStartRotation = head.transform.localRotation;
+		AddTail();
 	}
 	
 	// Update is called once per frame
@@ -89,7 +93,9 @@ public class Player : MonoBehaviour {
 		
 		//TODO check if collided
 		
-		//TODO add tails
+		//update tail
+		lastTail.transform.position = Vector3.Lerp(lastTailStartPos,nextPosition,0.5f);
+		
 		
 		transform.position = nextPosition;
 	}
@@ -157,6 +163,7 @@ public class Player : MonoBehaviour {
 		
 		orientation = newOrientation;
 		SetOrientation();
+		AddTail();
 	}
 	
 	private void Throttle(float val) {
@@ -169,6 +176,43 @@ public class Player : MonoBehaviour {
 	
 	public void SetOrientation() {
 		transform.rotation = Quaternion.Euler(new Vector3(0,OrientationToAngle(orientation),0));
+	}
+	
+	/**
+	 * Destroy all tails this player has
+	 * if instantly is true, the walls won't fall down but vanish now
+	 */
+	public void Destroy(bool instantly) {
+		if(instantly) {
+			foreach (GameObject g in tails) {
+				Destroy (g);
+			}
+		} else {
+			StartCoroutine(Fall());
+		}
+	}
+	/**
+	 * Make this players tails fall down
+	 * called when he dies through Destroy()
+	 */
+	System.Collections.IEnumerator Fall() {
+		//TODO convert this to an Update() in the Tails
+		List<GameObject> myTails = tails;
+		float y = -5.0f+playerHeight;
+		while(y > (-5.0f-playerHeight)) {
+			yield return new WaitForSeconds(1/30.0f);
+			y -= tailFallSpeed * Time.deltaTime;
+			foreach (GameObject g in tails) {
+				g.transform.position = new Vector3(g.transform.position.x, y, g.transform.position.z);
+			}
+		}
+	}
+	
+	private void AddTail() {
+		lastTail = (GameObject) Instantiate(tailPrefab);
+		lastTailStartPos = transform.position;
+		tails.Add(lastTail);
+		lastTail.transform.rotation = transform.rotation;
 	}
 	
 	public static float OrientationToAngle(Orientation or) {
