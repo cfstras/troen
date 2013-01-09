@@ -65,7 +65,13 @@ public class CreateWorld : MonoBehaviour {
 	
 	void OnGUI () {
 		if(Input.GetKeyDown(KeyCode.Escape)) {
-			showGUI = !showGUI;	
+			if(showGUI) {
+				manager.UnPause();
+				showGUI = false;
+			} else {
+				manager.Pause();
+				showGUI = true;
+			}
 		}
 		if(showGUI) {
 			windowRect = GUI.Window (0, windowRect, WindowFunction, "Settings");
@@ -131,8 +137,8 @@ public class CreateWorld : MonoBehaviour {
 		}
 		
 		if (GUI.Button(new Rect(100, ypos, 100, 30), "Start") && keyCodes != null && keyCodes.GetLength(0) == playerCount) {
-			KeyCode left, right, brake, speed, power;
 			showGUI = false;
+			KeyCode left, right, brake, speed, power;
 			manager.StartGame(playerCount);
 			for(int i=0;i < playerCount; i++) {
 				left = keyCodes[i,0];
@@ -143,7 +149,6 @@ public class CreateWorld : MonoBehaviour {
 				manager.players[i].SetKeyCodes(left,right,brake,speed,power);
 			}
 			manager.UnPause();
-			
 		}    
 	}
 }
