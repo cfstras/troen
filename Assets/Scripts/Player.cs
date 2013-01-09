@@ -23,6 +23,11 @@ public class Player : MonoBehaviour {
 	// Keyconfig
 	public KeyCode[] keyCodes;
 	
+	//Camera
+	public float cameraDampTime = 0.15f;
+	private Vector3 cameraVelocity = Vector3.zero;
+	public Camera playerCamera;
+	
 	/**
 	 * Use this to set the KeyCodes for a player
 	 * 
@@ -51,7 +56,7 @@ public class Player : MonoBehaviour {
 		}
 		
 		DoInput();
-		
+		UpdateCamera();
 		//TODO accelerate to normal speed
 		//TODO accelerate faster if next to wall
 		
@@ -200,5 +205,14 @@ public class Player : MonoBehaviour {
 	}
 	public enum Orientation {
 		North, East, South, West
+	}
+	
+	private void UpdateCamera() 
+	{
+			Vector3 point = playerCamera.WorldToViewportPoint(transform.position);
+			Vector3 delta = transform.position - playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, point.z)); //(new Vector3(0.5, 0.5, point.z));
+			Vector3 destination = playerCamera.transform.position + delta;
+			playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, destination, ref cameraVelocity, cameraDampTime);
+		
 	}
 }

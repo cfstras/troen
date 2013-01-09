@@ -5,6 +5,7 @@ public class GameManager : MonoBehaviour {
 	
 	//Prefabs
 	public GameObject playerPrefab;
+	public GameObject cameraPrefab;
 	
 	public List<Player> players;
 	
@@ -65,7 +66,8 @@ public class GameManager : MonoBehaviour {
 			}
 			p.SetOrientation();
 		}
-		
+		//create cameras
+		CreateCameras();
 		//TODO start overlay with countdown
 		
 		//freeze time until UnPause()
@@ -101,6 +103,32 @@ public class GameManager : MonoBehaviour {
 					p.AddInputEvent((Player.keyCodeIndex)i);
 				}
 			}
+		}
+	}
+	
+	void CreateCameras() {
+		foreach(Player p in players) {
+			p.playerCamera = ((GameObject) Instantiate(cameraPrefab)).camera;
+		}
+		switch(numPlayers) {
+			case 1:
+				players[0].playerCamera.rect = new Rect(0,0,1,1);
+				break;
+			case 2:
+				players[0].playerCamera.rect = new Rect(  0,0,0.5f,1);
+				players[1].playerCamera.rect = new Rect(0.5f,0,0.5f,1);
+				break;
+			case 3:
+				players[0].playerCamera.rect = new Rect(0,    0,0.5f,0.5f);
+				players[1].playerCamera.rect = new Rect(0.5f,  0,0.5f,0.5f);
+				players[2].playerCamera.rect = new Rect(0,  0.5f,0.5f,0.5f);
+				break;
+			case 4:
+				players[0].playerCamera.rect = new Rect(0,    0,0.5f,0.5f);
+				players[1].playerCamera.rect = new Rect(0.5f,  0,0.5f,0.5f);
+				players[2].playerCamera.rect = new Rect(0,  0.5f,0.5f,0.5f);
+				players[3].playerCamera.rect = new Rect(0.5f,0.5f,0.5f,0.5f);
+				break;
 		}
 	}
 	
