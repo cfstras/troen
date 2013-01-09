@@ -75,7 +75,7 @@ public class Player : MonoBehaviour {
 		}
 		
 		DoInput();
-		UpdateCamera();
+		FollowCamera();
 		//TODO accelerate to normal speed
 		//TODO accelerate faster if next to wall
 		
@@ -282,12 +282,9 @@ public class Player : MonoBehaviour {
 		North, East, South, West
 	}
 	
-	private void UpdateCamera() 
+	private void FollowCamera() 
 	{
-			Vector3 point = playerCamera.WorldToViewportPoint(transform.position);
-			Vector3 delta = transform.position - playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, point.z)); //(new Vector3(0.5, 0.5, point.z));
-			Vector3 destination = playerCamera.transform.position + delta;
-			playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, destination, ref cameraVelocity, cameraDampTime);
-		
+		SmoothFollow follow =  (SmoothFollow) playerCamera.GetComponent("SmoothFollow");
+		follow.target = transform;
 	}
 }
