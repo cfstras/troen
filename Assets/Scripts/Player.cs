@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class Player : MonoBehaviour {
 	
 	//constants
-	public const float playerHeight = 0.5f;
+	public const float playerHeight = 0.25f;
 	public const float turnDeadZone = 0.05f;
 	public const float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
@@ -94,8 +94,13 @@ public class Player : MonoBehaviour {
 		//TODO check if collided
 		
 		//update tail
-		lastTail.transform.position = Vector3.Lerp(lastTailStartPos,nextPosition,0.5f);
-		
+		lastTail.transform.position = Vector3.Lerp(
+			lastTailStartPos,
+			nextPosition,0.5f) - OrientationToVector(orientation)*lastTail.transform.localScale.z;
+		lastTail.transform.localScale = new Vector3(
+			Vector3.Distance(lastTailStartPos,nextPosition),
+			lastTail.transform.localScale.y,
+			lastTail.transform.localScale.z);
 		
 		transform.position = nextPosition;
 	}
@@ -202,7 +207,7 @@ public class Player : MonoBehaviour {
 		while(y > (-5.0f-playerHeight)) {
 			yield return new WaitForSeconds(1/30.0f);
 			y -= tailFallSpeed * Time.deltaTime;
-			foreach (GameObject g in tails) {
+			foreach (GameObject g in myTails) {
 				g.transform.position = new Vector3(g.transform.position.x, y, g.transform.position.z);
 			}
 		}
@@ -212,7 +217,10 @@ public class Player : MonoBehaviour {
 		lastTail = (GameObject) Instantiate(tailPrefab);
 		lastTailStartPos = transform.position;
 		tails.Add(lastTail);
-		lastTail.transform.rotation = transform.rotation;
+		lastTail.transform.rotation = Quaternion.Euler(
+			lastTail.transform.eulerAngles.x+transform.eulerAngles.x,
+			lastTail.transform.eulerAngles.y+transform.eulerAngles.y,
+			lastTail.transform.eulerAngles.z+transform.eulerAngles.z);
 	}
 	
 	public static float OrientationToAngle(Orientation or) {

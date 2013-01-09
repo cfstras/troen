@@ -13,7 +13,7 @@ public class CreateWorld : MonoBehaviour {
 	private Rect windowRect;
 	
 	KeyCode[,] keyCodes;
-	string playerCountField;
+	string playerCountField = "2";
 	int inputSelectedPlayer;
 	int inputSelectedKey;
 	int inputMaxKeys = 5;
