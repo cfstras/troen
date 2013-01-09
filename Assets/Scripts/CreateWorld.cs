@@ -61,6 +61,8 @@ public class CreateWorld : MonoBehaviour {
 		planeLeft.transform.position = new Vector3(5,0,0);
 		planeRight.transform.position = new Vector3(-5,0,0);
 		planeFloor.transform.position = new Vector3(0,-5,0);
+		//disable collison for floor
+		planeFloor.collider.enabled = false;
 	}
 	
 	void OnGUI () {

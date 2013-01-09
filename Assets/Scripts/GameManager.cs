@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour {
 		//delete old players
 		foreach (Player p in players)
 		{
-			p.Destroy(false);
+			p.Kill(false);
 			Destroy(p);
 		}
 		players.Clear();

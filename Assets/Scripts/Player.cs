@@ -38,8 +38,6 @@ public class Player : MonoBehaviour {
 	public KeyCode[] keyCodes;
 	
 	//Camera
-	public float cameraDampTime = 0.15f;
-	private Vector3 cameraVelocity = Vector3.zero;
 	public Camera playerCamera;
 	
 	/**
@@ -191,7 +189,7 @@ public class Player : MonoBehaviour {
 	 * Destroy all tails this player has
 	 * if instantly is true, the walls won't fall down but vanish now
 	 */
-	public void Destroy(bool instantly) {
+	public void Kill(bool instantly) {
 		if(instantly) {
 			foreach (GameObject g in tails) {
 				Destroy (g);
@@ -199,6 +197,7 @@ public class Player : MonoBehaviour {
 		} else {
 			StartCoroutine(Fall());
 		}
+		Destroy (gameObject);
 	}
 	/**
 	 * Make this players tails fall down
@@ -329,4 +328,12 @@ public class Player : MonoBehaviour {
 		SmoothFollow follow =  (SmoothFollow) playerCamera.GetComponent("SmoothFollow");
 		follow.target = transform;
 	}
+	
+	void Collide(Collider otherObject) {
+		if(otherObject.gameObject != lastTail) 
+		{
+			Kill (true);
+		}	
+	}
+	
 }
