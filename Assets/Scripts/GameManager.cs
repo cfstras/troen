@@ -43,8 +43,12 @@ public class GameManager : MonoBehaviour {
 		//create player instances
 		for(int i=0;i<numPlayers;i++) {
 			GameObject po = (GameObject)Instantiate (playerPrefab);
+			po.name = "Player "+i;
 			Player p = (Player) po.GetComponent(typeof(Player));
+			p.Start();
 			p.manager = this;
+			p.number = i;
+			p.SetColor();
 			players.Add (p);	
 		}
 		

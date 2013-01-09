@@ -17,7 +17,10 @@ public class Player : MonoBehaviour {
 	public LinkedList<InputEvent> inputEvents;
 	public GameManager manager;
 	
-	public GameObject head;
+	public Color color;
+	public int number;
+	
+	private GameObject head;
 	private Quaternion headFromRotation;
 	private Quaternion headStartRotation;
 	private float headTurnValue;
@@ -53,7 +56,7 @@ public class Player : MonoBehaviour {
 	}
 	
 	// Use this for initialization
-	void Start () {
+	public void Start () {
 		// Init Lists
 		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
@@ -62,6 +65,7 @@ public class Player : MonoBehaviour {
 		if(headTrans == null) {
 			Debug.LogError("Error: player head not found!");
 		} else {
+			Debug.Log("head found");
 			head = headTrans.gameObject;
 		}
 		headStartRotation = head.transform.localRotation;
@@ -96,7 +100,7 @@ public class Player : MonoBehaviour {
 		//update tail
 		lastTail.transform.position = Vector3.Lerp(
 			lastTailStartPos,
-			nextPosition,0.5f) - OrientationToVector(orientation)*lastTail.transform.localScale.z;
+			nextPosition,0.5f) - OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
 		lastTail.transform.localScale = new Vector3(
 			Vector3.Distance(lastTailStartPos,nextPosition),
 			lastTail.transform.localScale.y,
@@ -215,6 +219,8 @@ public class Player : MonoBehaviour {
 	
 	private void AddTail() {
 		lastTail = (GameObject) Instantiate(tailPrefab);
+		lastTail.name = "Tail "+number+" - "+tails.Count;
+		lastTail.renderer.material.color = Color.Lerp(Color.grey,color,0.8f);
 		lastTailStartPos = transform.position;
 		tails.Add(lastTail);
 		lastTail.transform.rotation = Quaternion.Euler(
@@ -274,6 +280,34 @@ public class Player : MonoBehaviour {
 			return;
 		}
 		inputEvents.AddLast(new InputEvent(a,val));
+	}
+	
+	public void SetColor() {
+		switch(number) {
+		case 0:
+			color = Color.red;
+			break;
+		case 1:
+			color = Color.green;
+			break;
+		case 2:
+			color = Color.blue;
+			break;
+		case 3:
+			color = Color.yellow;
+			break;
+		case 4:
+			color = Color.magenta;
+			break;
+		case 5:
+			color = Color.cyan;
+			break;
+			//TODO add more colors
+		default:
+			color = new Color(Random.Range (0,1),Random.Range (0,1),Random.Range (0,1));
+			break;
+		}
+		head.renderer.material.color = color;
 	}
 	
 	public enum keyCodeIndex {
