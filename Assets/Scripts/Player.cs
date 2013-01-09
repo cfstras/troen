@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
 	public const float playerHeight = 0.5f;
 	public const float turnDeadZone = 0.05f;
 	public const float playerSpeed = 1.0f;
+	public const float headTurnSpeed = 1.0f;
 	
 	// Prefabs
 	public GameObject tailPrefab;
@@ -14,7 +15,14 @@ public class Player : MonoBehaviour {
 	// Variables
 	public LinkedList<InputEvent> inputEvents;
 	public GameManager manager;
+	
+	public GameObject head;
+	private Quaternion headFromRotation;
+	private Quaternion headStartRotation;
+	private float headTurnValue;
+	
 	public List<GameObject> tails;
+	
 	public Orientation orientation;
 	public float speed;
 	
@@ -47,6 +55,13 @@ public class Player : MonoBehaviour {
 		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
 		speed = 1.0f;
+		Transform headTrans = transform.Find("Head");
+		if(headTrans == null) {
+			Debug.LogError("Error: player head not found!");
+		} else {
+			head = headTrans.gameObject;
+		}
+		headStartRotation = head.transform.localRotation;
 	}
 	
 	// Update is called once per frame
@@ -60,8 +75,17 @@ public class Player : MonoBehaviour {
 		//TODO accelerate to normal speed
 		//TODO accelerate faster if next to wall
 		
-		nextPosition = transform.position
-			+ OrientationToVector(orientation) * speed * Time.deltaTime;
+		
+		//turn head
+		
+		//if(headTurnValue <= 0) {
+		//	headTurnValue = 0;
+		//} else {
+		//	headTurnValue -= headTurnSpeed * Time.deltaTime;
+		//}
+		//head.transform.localRotation = Quaternion.Slerp(headFromRotation,headStartRotation,headTurnValue);
+		//update position
+		nextPosition = transform.position + OrientationToVector(orientation) * speed * Time.deltaTime;
 		
 		//TODO check if collided
 		
@@ -125,6 +149,12 @@ public class Player : MonoBehaviour {
 			}
 			break;
 		}
+		//turn head in opposite directon, to make him turn smooth afterwards
+		//float deltaOrientation = OrientationToAngle(newOrientation) - OrientationToAngle(orientation);
+		//headFromRotation = Quaternion.Euler(0, -deltaOrientation, 0);
+		//headTurnValue = 1;
+		//head.transform.localRotation = headFromRotation;
+		
 		orientation = newOrientation;
 		SetOrientation();
 	}
@@ -138,20 +168,21 @@ public class Player : MonoBehaviour {
 	}
 	
 	public void SetOrientation() {
-		switch(orientation) {
+		transform.rotation = Quaternion.Euler(new Vector3(0,OrientationToAngle(orientation),0));
+	}
+	
+	public static float OrientationToAngle(Orientation or) {
+		switch(or) {
 		case Orientation.North:
-			transform.rotation = Quaternion.Euler(new Vector3(0,0,0));
-			break;
+			return 0;
 		case Orientation.South:
-			transform.rotation = Quaternion.Euler(new Vector3(0,180,0));
-			break;
+			return 180;
 		case Orientation.East:
-			transform.rotation = Quaternion.Euler(new Vector3(0,90,0));
-			break;
+			return 90;
 		case Orientation.West:
-			transform.rotation = Quaternion.Euler(new Vector3(0,270,0));
-			break;
+			return 270;
 		}
+		return 0;
 	}
 	
 	public static Vector3 OrientationToVector(Orientation or) {
