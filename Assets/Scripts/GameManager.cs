@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour {
 	//Settings
 	public int numPlayers = 0;
 	
+	//Variables
+	public bool pause = true;
+	
 	void Start () {
 		//reset lists
 		if(players==null) {
@@ -43,18 +46,44 @@ public class GameManager : MonoBehaviour {
 			players.Add (p);	
 		}
 		
-		//TODO reset positions
+		//reset positions
+		foreach (Player p in players) {
+			p.transform.position = new Vector3(
+				Random.Range(-4.5f,4.5f),
+				-5.0f+Player.playerHeight,
+				Random.Range(-4.5f,4.5f));
+			
+			float rot = Random.Range(0,4);
+			if(rot<1) {
+				p.orientation = Player.Orientation.North;
+			} else if(rot<2) {
+				p.orientation = Player.Orientation.South;
+			} else if(rot<3) {
+				p.orientation = Player.Orientation.East;
+			} else {
+				p.orientation = Player.Orientation.West;
+			}
+			p.SetOrientation();
+		}
 		
 		//TODO start overlay with countdown
 		
-		//TODO freeze time until UnPause()
+		//freeze time until UnPause()
+		pause = true;
 	}
 	
 	/**
 	 * Unpauses the game
 	 */
 	public void UnPause() {
-		//TODO
+		pause = false;
+	}
+	
+	/**
+	 * Pauses the game
+	 */
+	public void Pause() {
+		pause = true;
 	}
 	
 	// Update is called once per frame
@@ -65,9 +94,10 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	void DoInput() {
+		
 		foreach (Player p in players) {
 			for(int i=0;i<p.keyCodes.Length;i++) {
-				if(Input.GetKey(p.keyCodes[i])) {
+				if(Input.GetKeyDown(p.keyCodes[i])) {
 					p.AddInputEvent((Player.keyCodeIndex)i);
 				}
 			}

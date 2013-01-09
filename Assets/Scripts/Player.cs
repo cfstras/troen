@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 public class Player : MonoBehaviour {
 	
+	//constants
+	public const float playerHeight = 0.5f;
+	public const float turnDeadZone = 0.05f;
+	public const float playerSpeed = 1.0f;
+	
 	// Prefabs
 	public GameObject tailPrefab;
 	
@@ -10,6 +15,10 @@ public class Player : MonoBehaviour {
 	public LinkedList<InputEvent> inputEvents;
 	public GameManager manager;
 	public List<GameObject> tails;
+	public Orientation orientation;
+	public float speed;
+	
+	private Vector3 nextPosition;
 	
 	// Keyconfig
 	public KeyCode[] keyCodes;
@@ -32,15 +41,28 @@ public class Player : MonoBehaviour {
 		// Init Lists
 		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
-		
+		speed = 1.0f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		if(manager.pause) {
+			return;
+		}
+		
 		DoInput();
-		//TODO check if game paused
+		
+		//TODO accelerate to normal speed
+		//TODO accelerate faster if next to wall
+		
+		nextPosition = transform.position
+			+ OrientationToVector(orientation) * speed * Time.deltaTime;
+		
 		//TODO check if collided
+		
 		//TODO add tails
+		
+		transform.position = nextPosition;
 	}
 	
 	void DoInput() {
@@ -48,8 +70,97 @@ public class Player : MonoBehaviour {
 			InputEvent e = inputEvents.First.Value;
 			inputEvents.RemoveFirst();
 			
-			//TODO apply event
+			//apply event
+			switch (e.axis) {
+			case InputEvent.Axis.Direction:
+				Turn(e.val);
+				break;
+			case InputEvent.Axis.Throttle:
+				Throttle(e.val);
+				break;
+			case InputEvent.Axis.Powerup:
+				Powerup(e.val);
+				break;
+			}
 		}
+	}
+	
+	private void Turn(float val) {
+		if(val <= turnDeadZone && val >= -turnDeadZone) {
+			return;
+		}
+		Orientation newOrientation = Orientation.North;
+		switch(orientation) {
+		case Orientation.North:
+			if(val>0) {
+				newOrientation = Orientation.East;
+			} else {
+				newOrientation = Orientation.West;
+			}
+			break;
+		case Orientation.East:
+			if(val>0) {
+				newOrientation = Orientation.South;
+			} else {
+				newOrientation = Orientation.North;
+			}
+			break;
+		case Orientation.South:
+			if(val>0) {
+				newOrientation = Orientation.West;
+			} else {
+				newOrientation = Orientation.East;
+			}
+			break;
+		case Orientation.West:
+			if(val>0) {
+				newOrientation = Orientation.North;
+			} else {
+				newOrientation = Orientation.South;
+			}
+			break;
+		}
+		orientation = newOrientation;
+		SetOrientation();
+	}
+	
+	private void Throttle(float val) {
+		//TODO brake and speed
+	}
+	
+	private void Powerup(float val) {
+		//TODO powerup
+	}
+	
+	public void SetOrientation() {
+		switch(orientation) {
+		case Orientation.North:
+			transform.rotation = Quaternion.Euler(new Vector3(0,0,0));
+			break;
+		case Orientation.South:
+			transform.rotation = Quaternion.Euler(new Vector3(0,180,0));
+			break;
+		case Orientation.East:
+			transform.rotation = Quaternion.Euler(new Vector3(0,90,0));
+			break;
+		case Orientation.West:
+			transform.rotation = Quaternion.Euler(new Vector3(0,270,0));
+			break;
+		}
+	}
+	
+	public static Vector3 OrientationToVector(Orientation or) {
+		switch(or) {
+			case Orientation.North:
+			return Vector3.forward;
+		case Orientation.South:
+			return Vector3.back;
+		case Orientation.East:
+			return Vector3.right;
+		case Orientation.West:
+			return Vector3.left;
+		}
+		return Vector3.zero;
 	}
 	
 	public void AddInputEvent(keyCodeIndex index) {
@@ -86,5 +197,8 @@ public class Player : MonoBehaviour {
 		
 		//... be sure to update this
 		Size = 5
+	}
+	public enum Orientation {
+		North, East, South, West
 	}
 }
