@@ -6,9 +6,10 @@ public class Player : MonoBehaviour {
 	//constants
 	public static float playerHeight = 0.25f;
 	public const float turnDeadZone = 0.05f;
-	public const float playerSpeed = 4.0f;
+	public static float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
 	public const float tailFallSpeed = 0.5f;
+	public static float tailBeginOffset = 3.5f;
 	
 	// Prefabs
 	public GameObject tailPrefab;
@@ -30,7 +31,7 @@ public class Player : MonoBehaviour {
 	private Vector3 lastTailStartPos;
 	
 	public Orientation orientation;
-	public float speed;
+	float speed;
 	
 	private Vector3 nextPosition;
 	
@@ -61,7 +62,7 @@ public class Player : MonoBehaviour {
 		// Init Lists
 		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
-		speed = 1.0f;
+		speed = playerSpeed;
 		Transform headTrans = transform.Find("Head");
 		if(headTrans == null) {
 			Debug.LogError("Error: player head not found!");
@@ -98,12 +99,15 @@ public class Player : MonoBehaviour {
 		
 		//TODO check if collided
 		
+		Vector3 or = OrientationToVector(orientation);
+		or.Scale(transform.localScale);
+		Vector3 tailEndPos = nextPosition - or * tailBeginOffset;
 		//update tail
 		lastTail.transform.position = Vector3.Lerp(
 			lastTailStartPos,
-			nextPosition,0.5f) - OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
+			tailEndPos,0.5f) - OrientationToVector(orientation)*1.0f*lastTail.transform.localScale.z;
 		lastTail.transform.localScale = new Vector3(
-			Vector3.Distance(lastTailStartPos,nextPosition),
+			Vector3.Distance(lastTailStartPos,tailEndPos),
 			lastTail.transform.localScale.y,
 			lastTail.transform.localScale.z);
 		
@@ -221,6 +225,21 @@ public class Player : MonoBehaviour {
 	}
 	
 	private void AddTail() {
+		if(lastTail != null) {
+			Vector3 or = OrientationToVector(orientation);
+			or.Scale(transform.localScale);
+			Vector3 tailEndPos = nextPosition - or * tailBeginOffset * 0;
+			//update tail
+			lastTail.transform.position = Vector3.Lerp(
+				lastTailStartPos,
+				tailEndPos,0.5f) - OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
+			lastTail.transform.localScale = new Vector3(
+				Vector3.Distance(lastTailStartPos,tailEndPos),
+				lastTail.transform.localScale.y,
+				lastTail.transform.localScale.z);
+		}
+		
+		
 		lastTail = (GameObject) Instantiate(tailPrefab);
 		lastTail.name = "Tail "+number+" - "+tails.Count;
 		lastTail.renderer.material.color = Color.Lerp(Color.grey,color,0.8f);
