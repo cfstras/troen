@@ -32,7 +32,7 @@ public class Player : MonoBehaviour {
 	private Vector3 lastTailStartPos;
 	
 	public Orientation orientation;
-	private Orientation newOrientation;
+	public Orientation newOrientation;
 	float speed;
 	
 	private Vector3 nextPosition;

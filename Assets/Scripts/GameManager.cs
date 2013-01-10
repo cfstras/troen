@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 	
+	public static float playerBaseLine = 4.0f;
+	
 	//Prefabs
 	public GameObject playerPrefab;
 	public GameObject cameraPrefab;
@@ -52,24 +54,67 @@ public class GameManager : MonoBehaviour {
 		}
 		
 		//reset positions
-		foreach (Player p in players) {
-			p.transform.position = new Vector3(
-				Random.Range(-4.5f,4.5f),
-				-5.0f+Player.playerHeight,
-				Random.Range(-4.5f,4.5f));
-			
-			float rot = Random.Range(0,4);
-			if(rot<1) {
-				p.orientation = Player.Orientation.North;
-			} else if(rot<2) {
-				p.orientation = Player.Orientation.South;
-			} else if(rot<3) {
-				p.orientation = Player.Orientation.East;
-			} else {
-				p.orientation = Player.Orientation.West;
+		
+		if(numPlayers == 2) {
+			for(int i = 0; i < numPlayers; i++) {
+				players[i].transform.position = new Vector3(
+					playerBaseLine * Mathf.Pow(-1,i),
+					-5.0f+Player.playerHeight,
+					0.0f);
+				if(i==0) {
+					players[i].orientation = players[i].newOrientation = Player.Orientation.West;
+				} else {
+					players[i].orientation = players[i].newOrientation = Player.Orientation.East;
+				}
+				players[i].SetOrientation();
 			}
-			p.SetOrientation();
+		} else {
+			int player = 0;
+			int playersPerSide = Mathf.Min(numPlayers/4,1);
+			for(int side=0; side<4; side++) {
+				float sideX = 0, sideY = 0;
+				Player.Orientation orientation = Player.Orientation.North;
+				switch(side) {
+				case 0:
+					sideX = playerBaseLine;
+					orientation = Player.Orientation.West;
+					break;
+				case 1:
+					sideX = -playerBaseLine;
+					orientation = Player.Orientation.East;
+					break;
+				case 2:
+					sideY = playerBaseLine;
+					orientation = Player.Orientation.South;
+					break;
+				case 3:
+					sideY = -playerBaseLine;
+					orientation = Player.Orientation.North;
+					break;
+				default:
+					Debug.LogError("Error while positioning players");
+					break;
+				}
+				for(int i=0; i < playersPerSide; i++) {
+					if(player >= numPlayers) {
+						break;
+					}
+					float offset = (1.0f/(playersPerSide+1)*(i+1))*10.0f-5.0f;
+					if(sideY == 0) {
+						sideY = offset;
+					} else {
+						sideX = offset;
+					}
+					players[player].transform.position = new Vector3(sideX,
+						-5.0f+Player.playerHeight, 
+						sideY);
+					players[player].orientation = players[player].newOrientation = orientation;
+					
+					player++;
+				}
+			}
 		}
+			
 		//create cameras
 		PositionCameras();
 		
