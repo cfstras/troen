@@ -34,6 +34,8 @@ public class Player : MonoBehaviour {
 	
 	private Vector3 nextPosition;
 	
+	public bool alive = true;
+	
 	// Keyconfig
 	public KeyCode[] keyCodes;
 	
@@ -190,6 +192,7 @@ public class Player : MonoBehaviour {
 	 * if instantly is true, the walls won't fall down but vanish now
 	 */
 	public void Kill(bool instantly) {
+		alive = false;
 		if(instantly) {
 			foreach (GameObject g in tails) {
 				Destroy (g);
@@ -309,7 +312,8 @@ public class Player : MonoBehaviour {
 		head.renderer.material.color = color;
 	}
 	
-	public enum keyCodeIndex {
+	public enum keyCodeIndex 
+	{
 		Left = 0,
 		Right = 1,
 		Speed = 2,
@@ -334,6 +338,14 @@ public class Player : MonoBehaviour {
 		{
 			Kill (true);
 		}	
+	}
+	
+	void OnGUI()
+	{
+		if(!alive) 
+		{
+			GUI.Label(new Rect(100,100,Screen.width,Screen.height),"YOU DIED!");
+		}
 	}
 	
 }
