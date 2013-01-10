@@ -84,44 +84,71 @@ public class CreateWorld : MonoBehaviour {
 		int ypos = 20;
 		// how many players?
 		GUI.Label (new Rect (10, ypos, 180, 20), "How many players?");
-		playerCountField = GUI.TextField(new Rect(185, ypos, 50, 20), playerCountField, 3);
+		playerCountField = GUI.TextField(new Rect(150, ypos, 50, 20), playerCountField, 3);
 		int newPlayerCount;
 		bool parseSuccess = int.TryParse(playerCountField, out newPlayerCount);
+		if(newPlayerCount<2) {
+			GUI.Label(new Rect(200,ypos,180,20),"Minimum is 2 players!");	
+		}
 		ypos += 30;
 		
 		//create storage for player inputMaxKeys
 		if(parseSuccess && (newPlayerCount != playerCount || keyCodes == null || keyCodes.GetLength(0) != playerCount)) {
-			playerCount = newPlayerCount;
 			inputSelectedPlayer = -1;
 			inputSelectedKey = -1;
-			keyCodes = new KeyCode[playerCount,inputMaxKeys];
+			KeyCode[,] newKeys = new KeyCode[newPlayerCount,inputMaxKeys];
 			//TODO copy old values
+			for(int p = 0; p < newPlayerCount && p < playerCount; p++) {
+				for(int k = 0; k < inputMaxKeys; k++) {
+					newKeys[p,k] = keyCodes[p,k];
+				}
+			}			
+			keyCodes = newKeys;
+			playerCount = newPlayerCount;
+			DefaultKeys();
 		}
 		
 		// set inputs for each player
-		GUI.Label(new Rect(120,ypos,50,20),"Left");
-		GUI.Label(new Rect(180,ypos,50,20),"Right");
-		GUI.Label(new Rect(240,ypos,50,20),"Brake");
-		GUI.Label(new Rect(300,ypos,50,20),"Speed");
-		GUI.Label(new Rect(360,ypos,50,20),"Powerup");
-		ypos += 25;
+		
 		for(int i = 0; i < playerCount; i++) {
-			//TODO: allow the players to change their names
-			GUI.Label (new Rect (10, ypos, 150, 20), "Keys for player " + (i+1).ToString()+":");
+			int xpos = 70;
+			int xsize = 75;
+			int dist = 10;
 			
-			if(GUI.Button(new Rect(120, ypos, 50, 20),Enum.GetName(typeof(KeyCode),keyCodes[i,0]))) {
+			if(i==0) {
+				GUI.Label(new Rect(xpos,ypos,xsize,20),"      Left");
+				xpos += xsize + dist;
+				GUI.Label(new Rect(xpos,ypos,xsize,20),"     Right");
+				xpos += xsize + dist;
+				GUI.Label(new Rect(xpos,ypos,xsize,20),"    Brake");
+				xpos += xsize + dist;
+				GUI.Label(new Rect(xpos,ypos,xsize,20),"    Speed");
+				xpos += xsize + dist;
+				GUI.Label(new Rect(xpos,ypos,xsize,20),"   Powerup");
+				ypos += 25;
+				xpos = 70;
+			}
+			
+			//TODO: allow the players to change their names
+			GUI.Label (new Rect (10, ypos, 150, 20), "Player " + (i+1).ToString()+":");
+			
+			if(GUI.Button(new Rect(xpos, ypos, xsize, 25),Enum.GetName(typeof(KeyCode),keyCodes[i,0]))) {
 				inputSelectedPlayer = i; inputSelectedKey = 0;
 			}
-			if(GUI.Button(new Rect(180, ypos, 50, 20),Enum.GetName(typeof(KeyCode),keyCodes[i,1]))) {
+			xpos += xsize+dist;
+			if(GUI.Button(new Rect(xpos, ypos, xsize, 25),Enum.GetName(typeof(KeyCode),keyCodes[i,1]))) {
 				inputSelectedPlayer = i; inputSelectedKey = 1;
 			}
-			if(GUI.Button(new Rect(240, ypos, 50, 20),Enum.GetName(typeof(KeyCode),keyCodes[i,2]))) {
+			xpos += xsize+dist;
+			if(GUI.Button(new Rect(xpos, ypos, xsize, 25),Enum.GetName(typeof(KeyCode),keyCodes[i,2]))) {
 				inputSelectedPlayer = i; inputSelectedKey = 2;
 			}
-			if(GUI.Button(new Rect(300, ypos, 50, 20),Enum.GetName(typeof(KeyCode),keyCodes[i,3]))) {
+			xpos += xsize+dist;
+			if(GUI.Button(new Rect(xpos, ypos, xsize, 25),Enum.GetName(typeof(KeyCode),keyCodes[i,3]))) {
 				inputSelectedPlayer = i; inputSelectedKey = 3;
 			}
-			if(GUI.Button(new Rect(360, ypos, 50, 20),Enum.GetName(typeof(KeyCode),keyCodes[i,4]))) {
+			xpos += xsize+dist;
+			if(GUI.Button(new Rect(xpos, ypos, xsize, 25),Enum.GetName(typeof(KeyCode),keyCodes[i,4]))) {
 				inputSelectedPlayer = i; inputSelectedKey = 4;
 			}
 			
@@ -138,7 +165,8 @@ public class CreateWorld : MonoBehaviour {
 			inputSelectedPlayer = -1; inputSelectedKey = -1;
 		}
 		
-		if (GUI.Button(new Rect(100, ypos, 100, 30), "Start") && keyCodes != null && keyCodes.GetLength(0) == playerCount) {
+		ypos += 10;
+		if (GUI.Button(new Rect(410, ypos, 75, 30), "Start") && keyCodes != null && keyCodes.GetLength(0) == playerCount) {
 			showGUI = false;
 			KeyCode left, right, brake, speed, power;
 			manager.StartGame(playerCount);
@@ -152,5 +180,22 @@ public class CreateWorld : MonoBehaviour {
 			}
 			manager.UnPause();
 		}    
+	}
+	
+	public readonly KeyCode[,] defaultKeys = {
+		{KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.UpArrow, KeyCode.LeftControl},
+		{KeyCode.A, KeyCode.D, KeyCode.S, KeyCode.W,KeyCode.F},
+		{KeyCode.J, KeyCode.L, KeyCode.K, KeyCode.I,KeyCode.BackQuote},
+		{KeyCode.Keypad4, KeyCode.Keypad6, KeyCode.Keypad5, KeyCode.Keypad8,KeyCode.KeypadPlus}
+	};
+	
+	private void DefaultKeys() {
+		for(int p = 0; p < playerCount; p++) {
+			for(int k = 0; k < inputMaxKeys; k++) {
+				if(keyCodes[p,k]==KeyCode.None && defaultKeys.GetLength(0) > p) {
+					keyCodes[p,k] = defaultKeys[p,k];
+				}
+			}
+		}
 	}
 }

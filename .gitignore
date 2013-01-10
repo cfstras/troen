@@ -18,5 +18,6 @@
 *.pidb
 *.sln
 *.userprefs
+*.unityproj
 
 build

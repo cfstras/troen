@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class Player : MonoBehaviour {
 	
 	//constants
-	public const float playerHeight = 0.25f;
+	public static float playerHeight = 0.25f;
 	public const float turnDeadZone = 0.05f;
 	public const float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
@@ -57,6 +57,7 @@ public class Player : MonoBehaviour {
 	
 	// Use this for initialization
 	public void Start () {
+		playerHeight = tailPrefab.transform.localScale.y/2;
 		// Init Lists
 		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
