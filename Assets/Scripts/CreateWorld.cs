@@ -35,7 +35,15 @@ public class CreateWorld : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if(Input.GetKeyDown(KeyCode.Escape)) {
+			if(showGUI) {
+				manager.UnPause();
+				showGUI = false;
+			} else {
+				manager.Pause();
+				showGUI = true;
+			}
+		}
 	}
 	
 	void createArena() {
@@ -66,15 +74,6 @@ public class CreateWorld : MonoBehaviour {
 	}
 	
 	void OnGUI () {
-		if(Input.GetKeyDown(KeyCode.Escape)) {
-			if(showGUI) {
-				manager.UnPause();
-				showGUI = false;
-			} else {
-				manager.Pause();
-				showGUI = true;
-			}
-		}
 		if(showGUI) {
 			windowRect = GUI.Window (0, windowRect, WindowFunction, "Settings");
 		}
