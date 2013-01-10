@@ -43,6 +43,7 @@ public class BeagleBoardIO {
 		fy = interpolate(y,-128,127,-1,1);
 		fz = interpolate(z,-128,127,-1,1);
 	}
+	
 	int convertInt(int i) {
 		if(i > 127)
 			return (i-256);

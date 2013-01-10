@@ -17,7 +17,10 @@ public class GameManager : MonoBehaviour {
 	//Variables
 	public bool pause = true;
 	
+	public static GameManager instance;
+	
 	void Start () {
+		instance = this;
 		//reset lists
 		if(players==null) {
 			players = new List<Player>();	
@@ -26,7 +29,7 @@ public class GameManager : MonoBehaviour {
 		//delete old players
 		foreach (Player p in players)
 		{
-			p.Kill(false);
+			p.Kill(true);
 			Destroy(p);
 		}
 		players.Clear();

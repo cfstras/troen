@@ -8,7 +8,6 @@ public class Player : MonoBehaviour {
 	public const float turnDeadZone = 0.05f;
 	public static float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
-	public const float tailFallSpeed = 10.0f;
 	public static float tailBeginOffset = 0.5f;
 	
 	// Prefabs
@@ -232,24 +231,12 @@ public class Player : MonoBehaviour {
 			foreach (GameObject g in tails) {
 				Destroy (g);
 			}
+			tails.Clear();
 		} else {
-			StartCoroutine(Fall(tails));
-		}
-	}
-	
-	/**
-	 * Make this players tails fall down
-	 * called when he dies through Destroy()
-	 */
-	System.Collections.IEnumerator Fall(List<GameObject> myTails) {
-		//TODO convert this to an Update() in the Tails
-		float y = -5.0f+playerHeight;
-		while(y > (-5.0f-playerHeight)) {
-			yield return new WaitForSeconds(1/30.0f);
-			y -= tailFallSpeed * Time.deltaTime;
-			foreach (GameObject g in myTails) {
-				g.transform.position = new Vector3(g.transform.position.x, y, g.transform.position.z);
+			foreach(GameObject g in tails) {
+				g.SendMessage("FallDown");
 			}
+			tails.Clear();
 		}
 	}
 	
@@ -374,21 +361,20 @@ public class Player : MonoBehaviour {
 	void Collide(Collider otherObject) {
 		if(alive) {
 			if(otherObject.gameObject != lastTail) {
-				Kill (true);
+				Kill (false);
 			}
-			//otherobject is a player
+			
 			if(otherObject.name.Contains("Player")) {
+				//otherobject is a player
 				otherObject.SendMessage("Kill", false);
 				Debug.Log(otherObject.name + " destroyed himself and " + name);
-			}
-			//otherobject is a tail
-			if(otherObject.name.Contains("Tail")) {
+			} else if(otherObject.name.Contains("Tail")) {
+				//otherobject is a tail
 				Tail tail = (Tail) otherObject.GetComponent("Tail");
 				tail.player.SendMessage("addPoint");
 				Debug.Log(name + " got destroyed by tail from " + tail.player.name);
-			}
-			//otherobject is a wall
-			if(otherObject.tag == "wall") {
+			} else if(otherObject.tag == "wall") {
+				//otherobject is a wall
 				Debug.Log(name + " got destroyed by a wall.");	
 			}
 		}
