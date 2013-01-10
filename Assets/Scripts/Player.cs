@@ -8,7 +8,7 @@ public class Player : MonoBehaviour {
 	public const float turnDeadZone = 0.05f;
 	public static float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
-	public const float tailFallSpeed = 0.5f;
+	public const float tailFallSpeed = 10.0f;
 	public static float tailBeginOffset = 3.5f;
 	
 	// Prefabs
@@ -57,7 +57,7 @@ public class Player : MonoBehaviour {
 	}
 	
 	// Use this for initialization
-	public void Start () {
+	public void InitializePlayer () {
 		playerHeight = tailPrefab.transform.localScale.y/2;
 		// Init Lists
 		tails = new List<GameObject>();
@@ -67,10 +67,10 @@ public class Player : MonoBehaviour {
 		if(headTrans == null) {
 			Debug.LogError("Error: player head not found!");
 		} else {
-			Debug.Log("head found");
 			head = headTrans.gameObject;
 		}
 		headStartRotation = head.transform.localRotation;
+		SetColor();
 		AddTail();
 	}
 	
@@ -203,17 +203,17 @@ public class Player : MonoBehaviour {
 				Destroy (g);
 			}
 		} else {
-			StartCoroutine(Fall());
+			StartCoroutine(Fall(tails));
 		}
 		Destroy (gameObject);
 	}
+	
 	/**
 	 * Make this players tails fall down
 	 * called when he dies through Destroy()
 	 */
-	System.Collections.IEnumerator Fall() {
+	System.Collections.IEnumerator Fall(List<GameObject> myTails) {
 		//TODO convert this to an Update() in the Tails
-		List<GameObject> myTails = tails;
 		float y = -5.0f+playerHeight;
 		while(y > (-5.0f-playerHeight)) {
 			yield return new WaitForSeconds(1/30.0f);
@@ -225,19 +225,19 @@ public class Player : MonoBehaviour {
 	}
 	
 	private void AddTail() {
-		if(lastTail != null) {
-			Vector3 or = OrientationToVector(orientation);
-			or.Scale(transform.localScale);
-			Vector3 tailEndPos = nextPosition - or * tailBeginOffset * 0;
-			//update tail
-			lastTail.transform.position = Vector3.Lerp(
-				lastTailStartPos,
-				tailEndPos,0.5f) - OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
-			lastTail.transform.localScale = new Vector3(
-				Vector3.Distance(lastTailStartPos,tailEndPos),
-				lastTail.transform.localScale.y,
-				lastTail.transform.localScale.z);
-		}
+//		if(lastTail != null) {
+//			Vector3 or = OrientationToVector(orientation);
+//			or.Scale(transform.localScale);
+//			Vector3 tailEndPos = nextPosition - or * tailBeginOffset * 0;
+//			//update tail
+//			lastTail.transform.position = Vector3.Lerp(
+//				lastTailStartPos,
+//				tailEndPos,0.5f) - OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
+//			lastTail.transform.localScale = new Vector3(
+//				Vector3.Distance(lastTailStartPos,tailEndPos),
+//				lastTail.transform.localScale.y,
+//				lastTail.transform.localScale.z);
+//		}
 		
 		
 		lastTail = (GameObject) Instantiate(tailPrefab);
@@ -304,7 +304,7 @@ public class Player : MonoBehaviour {
 		inputEvents.AddLast(new InputEvent(a,val));
 	}
 	
-	public void SetColor() {
+	private void SetColor() {
 		switch(number) {
 		case 0:
 			color = Color.red;
@@ -356,7 +356,7 @@ public class Player : MonoBehaviour {
 	void Collide(Collider otherObject) {
 		if(otherObject.gameObject != lastTail) 
 		{
-			Kill (true);
+			Kill (false);
 		}	
 	}
 	

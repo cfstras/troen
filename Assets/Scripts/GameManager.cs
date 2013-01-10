@@ -45,10 +45,9 @@ public class GameManager : MonoBehaviour {
 			GameObject po = (GameObject)Instantiate (playerPrefab);
 			po.name = "Player "+i;
 			Player p = (Player) po.GetComponent(typeof(Player));
-			p.Start();
 			p.manager = this;
 			p.number = i;
-			p.SetColor();
+			p.InitializePlayer();
 			players.Add (p);	
 		}
 		
