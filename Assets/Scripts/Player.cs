@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
 	//constants
 	public static float playerHeight = 0.25f;
 	public const float turnDeadZone = 0.05f;
-	public const float playerSpeed = 2.0f;
+	public const float playerSpeed = 4.0f;
 	public const float headTurnSpeed = 1.0f;
 	public const float tailFallSpeed = 0.5f;
 	
