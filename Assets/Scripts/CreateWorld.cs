@@ -24,7 +24,7 @@ public class CreateWorld : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		windowRect = new Rect(Camera.main.pixelWidth/2-150, Camera.main.pixelHeight/2-250, 500, 500);
+		windowRect = new Rect(Camera.main.pixelWidth/2-250, Camera.main.pixelHeight/2-250, 500, 500);
 		playerCountField = "2";
 		Debug.Log("CreateWorld Start()");
 		inputSelectedPlayer = -1;
@@ -178,7 +178,10 @@ public class CreateWorld : MonoBehaviour {
 				manager.players[i].SetKeyCodes(left,right,brake,speed,power);
 			}
 			manager.UnPause();
-		}    
+		}
+		if (GUI.Button(new Rect(300, ypos, 75, 30), "Quit") ) {
+			Application.Quit();
+		}
 	}
 	
 	public readonly KeyCode[,] defaultKeys = {
