@@ -103,7 +103,9 @@ public class GameManager : MonoBehaviour {
 		DoInput();
 		//check for dead players
 		//do something?
-		DoGame();
+		if(pause == false) {
+			DoGame();
+		}
 	}
 	
 	void DoInput() {
@@ -142,7 +144,8 @@ public class GameManager : MonoBehaviour {
 		if(player.alive) {
 			player.addPoint();
 		}
-		//TODO: restart the game now
+		pause = true;
+		player.alive = false;
 	}
 	
 	void PositionCameras() {

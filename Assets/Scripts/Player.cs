@@ -372,27 +372,25 @@ public class Player : MonoBehaviour {
 	}
 	
 	void Collide(Collider otherObject) {
-		if(otherObject.gameObject != lastTail) 
-		{
-			Kill (false);
-		}	
-		if(otherObject.gameObject != lastTail) {
-			Kill (true);
-		}
-		//otherobject is a player
-		if(otherObject.name.Contains("Player")) {
-			otherObject.SendMessage("Kill", false);
-			Debug.Log(otherObject.name + " destroyed " + name);
-		}
-		//otherobject is a tail
-		if(otherObject.name.Contains("Tail")) {
-			Tail tail = (Tail) otherObject.GetComponent("Tail");
-			tail.player.SendMessage("addPoint");
-			Debug.Log(name + " got destroyed by tail from " + tail.player.name);
-		}
-		//otherobject is a wall
-		if(otherObject.tag == "wall") {
-			Debug.Log(name + " got destroyed by a wall.");	
+		if(alive) {
+			if(otherObject.gameObject != lastTail) {
+				Kill (true);
+			}
+			//otherobject is a player
+			if(otherObject.name.Contains("Player")) {
+				otherObject.SendMessage("Kill", false);
+				Debug.Log(otherObject.name + " destroyed himself and " + name);
+			}
+			//otherobject is a tail
+			if(otherObject.name.Contains("Tail")) {
+				Tail tail = (Tail) otherObject.GetComponent("Tail");
+				tail.player.SendMessage("addPoint");
+				Debug.Log(name + " got destroyed by tail from " + tail.player.name);
+			}
+			//otherobject is a wall
+			if(otherObject.tag == "wall") {
+				Debug.Log(name + " got destroyed by a wall.");	
+			}
 		}
 	}
 	
