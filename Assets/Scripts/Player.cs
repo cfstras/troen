@@ -38,6 +38,7 @@ public class Player : MonoBehaviour {
 	private Vector3 nextPosition;
 	
 	public bool alive = true;
+	public int points = 0;
 	
 	// Keyconfig
 	public KeyCode[] keyCodes;
@@ -76,11 +77,17 @@ public class Player : MonoBehaviour {
 		SetOrientation();
 		SetColor();
 		AddTail();
+		name = "Player "+number.ToString();
+	}
+	public void newRound() {
+		transform.Find("Head").renderer.enabled = true;
+		collider.enabled = true;
+		collider.isTrigger = true;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(manager.pause) {
+		if(manager.pause || !alive) {
 			return;
 		}
 		
@@ -217,6 +224,10 @@ public class Player : MonoBehaviour {
 	 */
 	public void Kill(bool instantly) {
 		alive = false;
+		points--;
+		transform.Find("Head").renderer.enabled = false;
+		collider.enabled = false;
+		collider.isTrigger = false;
 		if(instantly) {
 			foreach (GameObject g in tails) {
 				Destroy (g);
@@ -224,7 +235,6 @@ public class Player : MonoBehaviour {
 		} else {
 			StartCoroutine(Fall(tails));
 		}
-		Destroy (gameObject);
 	}
 	
 	/**
@@ -250,6 +260,8 @@ public class Player : MonoBehaviour {
 		lastTail.name = "Tail "+number+" - "+tails.Count;
 		lastTail.renderer.material.color = Color.Lerp(Color.grey,color,0.8f);
 		lastTailStartPos = transform.position;
+		Tail tail = (Tail)lastTail.GetComponent("Tail");
+		tail.player = gameObject;
 		tails.Add(lastTail);
 		lastTail.transform.rotation = Quaternion.Euler(
 			lastTail.transform.eulerAngles.x+transform.eulerAngles.x,
@@ -354,25 +366,36 @@ public class Player : MonoBehaviour {
 		North, East, South, West
 	}
 	
-	private void FollowCamera() 
-	{
+	private void FollowCamera() {
 		SmoothFollow follow =  (SmoothFollow) playerCamera.GetComponent("SmoothFollow");
 		follow.target = transform;
 	}
 	
 	void Collide(Collider otherObject) {
-		if(otherObject.gameObject != lastTail) 
-		{
-			Kill (false);
-		}	
+		if(alive) {
+			if(otherObject.gameObject != lastTail) {
+				Kill (true);
+			}
+			//otherobject is a player
+			if(otherObject.name.Contains("Player")) {
+				otherObject.SendMessage("Kill", false);
+				Debug.Log(otherObject.name + " destroyed himself and " + name);
+			}
+			//otherobject is a tail
+			if(otherObject.name.Contains("Tail")) {
+				Tail tail = (Tail) otherObject.GetComponent("Tail");
+				tail.player.SendMessage("addPoint");
+				Debug.Log(name + " got destroyed by tail from " + tail.player.name);
+			}
+			//otherobject is a wall
+			if(otherObject.tag == "wall") {
+				Debug.Log(name + " got destroyed by a wall.");	
+			}
+		}
 	}
 	
-	void OnGUI()
-	{
-		if(!alive) 
-		{
-			GUI.Label(new Rect(100,100,Screen.width,Screen.height),"YOU DIED!");
-		}
+	public void addPoint() {
+		points++;
 	}
 	
 }

@@ -148,16 +148,49 @@ public class GameManager : MonoBehaviour {
 		DoInput();
 		//check for dead players
 		//do something?
+		if(pause == false) {
+			DoGame();
+		}
 	}
 	
 	void DoInput() {
 		foreach (Player p in players) {
 			for(int i=0;i<p.keyCodes.Length;i++) {
-				if(Input.GetKeyDown(p.keyCodes[i])) {
+				if(Input.GetKeyDown(p.keyCodes[i]) && p.alive) {
 					p.AddInputEvent((Player.keyCodeIndex)i);
 				}
 			}
 		}
+	}
+	
+	void DoGame() {
+		int aliveCount = 0;
+		foreach(Player p in players) {
+			if(p.alive) {
+				aliveCount++;
+			}
+		}
+		if(aliveCount == 1) {
+			// get last alive player
+			Player last = null;
+			foreach (Player p in players) {
+				if(p.alive) {
+					last = p;
+				}
+			}
+			//wait five seconds then end game and give winner points
+			
+			StartCoroutine(DoEndGame(last));
+		}
+	}
+	
+	System.Collections.IEnumerator DoEndGame(Player player) {
+		yield return new WaitForSeconds(5);
+		if(player.alive) {
+			player.addPoint();
+		}
+		pause = true;
+		player.alive = false;
 	}
 	
 	void PositionCameras() {
@@ -183,5 +216,14 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 	
+	void OnGUI(){
+		int offset = 0;
+		foreach(Player p in players) {
+			if(p != null) {
+    			GUI.Label(new Rect(20,20+offset,250,40),p.name+": "+p.points+" Punkte");
+				offset += 40;
+			}
+		}
+	}
 
 }
