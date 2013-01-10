@@ -46,8 +46,8 @@ public class GameManager : MonoBehaviour {
 			po.name = "Player "+i;
 			Player p = (Player) po.GetComponent(typeof(Player));
 			p.manager = this;
-			p.number = i;
-			p.InitializePlayer();
+			p.number = i;			
+			p.playerCamera = ((GameObject) Instantiate(cameraPrefab)).camera;
 			players.Add (p);	
 		}
 		
@@ -71,7 +71,13 @@ public class GameManager : MonoBehaviour {
 			p.SetOrientation();
 		}
 		//create cameras
-		CreateCameras();
+		PositionCameras();
+		
+		//init players
+		foreach (Player p in players) {
+			p.InitializePlayer();	
+		}
+		
 		//TODO start overlay with countdown
 		
 		//freeze time until UnPause()
@@ -100,7 +106,6 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	void DoInput() {
-		
 		foreach (Player p in players) {
 			for(int i=0;i<p.keyCodes.Length;i++) {
 				if(Input.GetKeyDown(p.keyCodes[i])) {
@@ -110,10 +115,7 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 	
-	void CreateCameras() {
-		foreach(Player p in players) {
-			p.playerCamera = ((GameObject) Instantiate(cameraPrefab)).camera;
-		}
+	void PositionCameras() {
 		switch(numPlayers) {
 			case 1:
 				players[0].playerCamera.rect = new Rect(0,0,1,1);

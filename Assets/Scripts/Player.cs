@@ -4,12 +4,12 @@ using System.Collections.Generic;
 public class Player : MonoBehaviour {
 	
 	//constants
-	public static float playerHeight = 0.25f;
+	public static float playerHeight = 0.0625f;
 	public const float turnDeadZone = 0.05f;
 	public static float playerSpeed = 2.0f;
 	public const float headTurnSpeed = 1.0f;
 	public const float tailFallSpeed = 10.0f;
-	public static float tailBeginOffset = 3.5f;
+	public static float tailBeginOffset = 0.5f;
 	
 	// Prefabs
 	public GameObject tailPrefab;
@@ -25,12 +25,14 @@ public class Player : MonoBehaviour {
 	private Quaternion headFromRotation;
 	private Quaternion headStartRotation;
 	private float headTurnValue;
+	private float waitingToTurn;
 	
 	public List<GameObject> tails;
 	public GameObject lastTail;
 	private Vector3 lastTailStartPos;
 	
 	public Orientation orientation;
+	private Orientation newOrientation;
 	float speed;
 	
 	private Vector3 nextPosition;
@@ -58,10 +60,11 @@ public class Player : MonoBehaviour {
 	
 	// Use this for initialization
 	public void InitializePlayer () {
-		playerHeight = tailPrefab.transform.localScale.y/2;
 		// Init Lists
 		tails = new List<GameObject>();
 		inputEvents = new LinkedList<InputEvent>();
+		FollowCamera();
+
 		speed = playerSpeed;
 		Transform headTrans = transform.Find("Head");
 		if(headTrans == null) {
@@ -70,6 +73,7 @@ public class Player : MonoBehaviour {
 			head = headTrans.gameObject;
 		}
 		headStartRotation = head.transform.localRotation;
+		SetOrientation();
 		SetColor();
 		AddTail();
 	}
@@ -81,10 +85,8 @@ public class Player : MonoBehaviour {
 		}
 		
 		DoInput();
-		FollowCamera();
 		//TODO accelerate to normal speed
 		//TODO accelerate faster if next to wall
-		
 		
 		//turn head
 		
@@ -94,24 +96,41 @@ public class Player : MonoBehaviour {
 		//	headTurnValue -= headTurnSpeed * Time.deltaTime;
 		//}
 		//head.transform.localRotation = Quaternion.Slerp(headFromRotation,headStartRotation,headTurnValue);
+		
 		//update position
 		nextPosition = transform.position + OrientationToVector(orientation) * speed * Time.deltaTime;
 		
+		if(waitingToTurn!=0) {
+			Turn();
+		}
+		
 		//TODO check if collided
 		
+		UpdateTail(1);
+		
+		orientation = newOrientation;
+		transform.position = nextPosition;
+	}
+	
+	void UpdateTail(float offset) {
+		if(lastTail == null) {
+			return;	
+		}
 		Vector3 or = OrientationToVector(orientation);
 		or.Scale(transform.localScale);
-		Vector3 tailEndPos = nextPosition - or * tailBeginOffset;
+		Vector3 tailEndPos = nextPosition - or * tailBeginOffset * offset;
+		
+		Vector3 tailStartPos = lastTailStartPos;
 		//update tail
 		lastTail.transform.position = Vector3.Lerp(
 			lastTailStartPos,
-			tailEndPos,0.5f) - OrientationToVector(orientation)*1.0f*lastTail.transform.localScale.z;
+			tailEndPos,0.5f);
+		//OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
 		lastTail.transform.localScale = new Vector3(
 			Vector3.Distance(lastTailStartPos,tailEndPos),
 			lastTail.transform.localScale.y,
 			lastTail.transform.localScale.z);
 		
-		transform.position = nextPosition;
 	}
 	
 	void DoInput() {
@@ -122,7 +141,7 @@ public class Player : MonoBehaviour {
 			//apply event
 			switch (e.axis) {
 			case InputEvent.Axis.Direction:
-				Turn(e.val);
+				waitingToTurn = e.val;
 				break;
 			case InputEvent.Axis.Throttle:
 				Throttle(e.val);
@@ -134,11 +153,13 @@ public class Player : MonoBehaviour {
 		}
 	}
 	
-	private void Turn(float val) {
+	private void Turn() {
+		float val = waitingToTurn;
+		waitingToTurn = 0;
 		if(val <= turnDeadZone && val >= -turnDeadZone) {
 			return;
 		}
-		Orientation newOrientation = Orientation.North;
+		newOrientation = Orientation.North;
 		switch(orientation) {
 		case Orientation.North:
 			if(val>0) {
@@ -174,8 +195,6 @@ public class Player : MonoBehaviour {
 		//headFromRotation = Quaternion.Euler(0, -deltaOrientation, 0);
 		//headTurnValue = 1;
 		//head.transform.localRotation = headFromRotation;
-		
-		orientation = newOrientation;
 		SetOrientation();
 		AddTail();
 	}
@@ -189,7 +208,7 @@ public class Player : MonoBehaviour {
 	}
 	
 	public void SetOrientation() {
-		transform.rotation = Quaternion.Euler(new Vector3(0,OrientationToAngle(orientation),0));
+		transform.rotation = Quaternion.Euler(new Vector3(0,OrientationToAngle(newOrientation),0));
 	}
 	
 	/**
@@ -225,20 +244,7 @@ public class Player : MonoBehaviour {
 	}
 	
 	private void AddTail() {
-//		if(lastTail != null) {
-//			Vector3 or = OrientationToVector(orientation);
-//			or.Scale(transform.localScale);
-//			Vector3 tailEndPos = nextPosition - or * tailBeginOffset * 0;
-//			//update tail
-//			lastTail.transform.position = Vector3.Lerp(
-//				lastTailStartPos,
-//				tailEndPos,0.5f) - OrientationToVector(orientation)*0.5f*lastTail.transform.localScale.z;
-//			lastTail.transform.localScale = new Vector3(
-//				Vector3.Distance(lastTailStartPos,tailEndPos),
-//				lastTail.transform.localScale.y,
-//				lastTail.transform.localScale.z);
-//		}
-		
+		UpdateTail(1);
 		
 		lastTail = (GameObject) Instantiate(tailPrefab);
 		lastTail.name = "Tail "+number+" - "+tails.Count;
@@ -249,6 +255,7 @@ public class Player : MonoBehaviour {
 			lastTail.transform.eulerAngles.x+transform.eulerAngles.x,
 			lastTail.transform.eulerAngles.y+transform.eulerAngles.y,
 			lastTail.transform.eulerAngles.z+transform.eulerAngles.z);
+		UpdateTail(1);
 	}
 	
 	public static float OrientationToAngle(Orientation or) {
