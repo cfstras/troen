@@ -276,7 +276,7 @@ public class GameManager : MonoBehaviour {
 				GUIStyle style1 = new GUIStyle();
 				style1.fontSize = 20;
 				style1.normal.textColor = p.color;
-    			GUI.Label(new Rect(p.textPosX,p.textPosY,250,40),p.name+": "+p.points+" Punkte",style1);
+    			GUI.Label(new Rect(p.textPosX,p.textPosY,250,40),p.name+": "+p.points+" points",style1);
 				if(p.alive == false && !p.winner) {
 					GUIStyle style2 = new GUIStyle();
 					style2.fontSize = 40;
