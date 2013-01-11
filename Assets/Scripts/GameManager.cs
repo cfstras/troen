@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour {
 	//Variables
 	public bool pause = true;
 	
+	public float offsetX, offsetY;
+	
 	public static GameManager instance;
 	
 	void Start () {
@@ -121,6 +123,10 @@ public class GameManager : MonoBehaviour {
 		//create cameras
 		PositionCameras();
 		
+		SetCameraTextPositioningOffsets();
+		
+		PositionPlayerNotifications();
+		
 		//init players
 		foreach (Player p in players) {
 			p.InitializePlayer();	
@@ -190,6 +196,7 @@ public class GameManager : MonoBehaviour {
 	System.Collections.IEnumerator DoEndGame(Player player) {
 		yield return new WaitForSeconds(5);
 		if(player.alive) {
+			player.winner = true;
 			player.addPoint();
 		}
 		pause = true;
@@ -198,9 +205,6 @@ public class GameManager : MonoBehaviour {
 	
 	void PositionCameras() {
 		switch(numPlayers) {
-			case 1:
-				players[0].playerCamera.rect = new Rect(0,0,1,1);
-				break;
 			case 2:
 				players[0].playerCamera.rect = new Rect(  0,0,0.5f,1);
 				players[1].playerCamera.rect = new Rect(0.5f,0,0.5f,1);
@@ -219,12 +223,74 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 	
+	void PositionPlayerNotifications() {
+		switch(numPlayers) {
+			case 2:
+				players[0].textPosX = 0;
+				players[0].textPosY = 0;
+				players[1].textPosX = Camera.main.pixelWidth/2;
+				players[1].textPosY = 0;
+				break;
+			case 3:
+				players[0].textPosX = 0;
+				players[0].textPosY = 0;
+				players[1].textPosX = 0;
+				players[1].textPosY = Camera.main.pixelHeight/2;
+				players[2].textPosX = Camera.main.pixelWidth/2;
+				players[2].textPosY = Camera.main.pixelHeight/2;
+				break;
+			case 4:
+				players[0].textPosX = 0;
+				players[0].textPosY = 0;
+				players[1].textPosX = Camera.main.pixelWidth/2;
+				players[1].textPosY = 0;
+				players[2].textPosX = 0;
+				players[2].textPosY = Camera.main.pixelHeight/2;
+				players[3].textPosX = Camera.main.pixelWidth/2;
+				players[3].textPosY = Camera.main.pixelHeight/2;
+				break;
+		}
+		Debug.Log("offsetX: " + offsetX + " offsetY: " + offsetY);
+	}
+	
+	void SetCameraTextPositioningOffsets() {
+		switch(numPlayers) {
+			case 2:
+				offsetX = Camera.main.pixelWidth/4;
+				offsetY = Camera.main.pixelHeight/2;
+				break;
+			case 3:
+				offsetX = Camera.main.pixelWidth/4;
+				offsetY = Camera.main.pixelWidth/4;
+				break;
+			case 4:
+				offsetX = Camera.main.pixelWidth/4;
+				offsetY = Camera.main.pixelWidth/4;
+				break;
+		}
+	}
+	
 	void OnGUI(){
-		int offset = 0;
 		foreach(Player p in players) {
 			if(p != null) {
-    			GUI.Label(new Rect(20,20+offset,250,40),p.name+": "+p.points+" Punkte");
-				offset += 40;
+				GUIStyle style1 = new GUIStyle();
+				style1.fontSize = 20;
+				style1.normal.textColor = p.color;
+    			GUI.Label(new Rect(p.textPosX,p.textPosY,250,40),p.name+": "+p.points+" Punkte",style1);
+				if(p.alive == false && !p.winner) {
+					GUIStyle style2 = new GUIStyle();
+					style2.fontSize = 40;
+					style2.normal.textColor = p.color;
+					float ydiff = (numPlayers==2?125:250);
+					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU DIED!",style2);
+				}
+				if(p.winner == true) {
+					GUIStyle style3 = new GUIStyle();
+					style3.fontSize = 40;
+					style3.normal.textColor = p.color;
+					float ydiff = (numPlayers==2?125:250);
+					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU WON!",style3);
+				}
 			}
 		}
 	}

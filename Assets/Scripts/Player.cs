@@ -37,6 +37,7 @@ public class Player : MonoBehaviour {
 	private Vector3 nextPosition;
 	
 	public bool alive = true;
+	public bool winner = false;
 	public int points = 0;
 	
 	// Keyconfig
@@ -44,6 +45,9 @@ public class Player : MonoBehaviour {
 	
 	//Camera
 	public Camera playerCamera;
+	
+	//text notification positons
+	public float textPosX, textPosY;
 	
 	/**
 	 * Use this to set the KeyCodes for a player
@@ -76,12 +80,13 @@ public class Player : MonoBehaviour {
 		SetOrientation();
 		SetColor();
 		AddTail();
-		name = "Player "+number.ToString();
+		name = "Player "+(number+1).ToString();
 	}
 	public void newRound() {
 		transform.Find("Head").renderer.enabled = true;
 		collider.enabled = true;
 		collider.isTrigger = true;
+		winner= false;
 	}
 	
 	// Update is called once per frame
