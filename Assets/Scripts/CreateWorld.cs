@@ -165,7 +165,7 @@ public class CreateWorld : MonoBehaviour {
 		}
 		
 		ypos += 10;
-		if (GUI.Button(new Rect(410, ypos, 75, 30), "Start") && keyCodes != null && keyCodes.GetLength(0) == playerCount) {
+		if (GUI.Button(new Rect(410, ypos, 75, 30), "Start") && keyCodes != null && keyCodes.GetLength(0) == playerCount && newPlayerCount>1) {
 			showGUI = false;
 			KeyCode left, right, brake, speed, power;
 			manager.StartGame(playerCount);

@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour {
 	
 	public static GameManager instance;
 	
+	string countdownText;
+	
 	void Start () {
 		instance = this;
 		//reset lists
@@ -142,7 +144,7 @@ public class GameManager : MonoBehaviour {
 	 * Unpauses the game
 	 */
 	public void UnPause() {
-		pause = false;
+		StartCoroutine(Countdown());
 	}
 	
 	/**
@@ -150,6 +152,20 @@ public class GameManager : MonoBehaviour {
 	 */
 	public void Pause() {
 		pause = true;
+	}
+	
+	System.Collections.IEnumerator Countdown() {
+		yield return new WaitForSeconds(1);
+		countdownText = "3";
+		yield return new WaitForSeconds(1);
+		countdownText = "2";
+		yield return new WaitForSeconds(1);
+		countdownText = "1";
+		yield return new WaitForSeconds(1);
+		countdownText = "GO!";
+		pause = false;
+		yield return new WaitForSeconds(1);
+		countdownText = "";
 	}
 	
 	// Update is called once per frame
@@ -293,6 +309,10 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 		}
+		GUIStyle style4 = new GUIStyle();
+		style4.fontSize = 50;
+		style4.normal.textColor = Color.white;
+		GUI.Label(new Rect(Camera.main.pixelWidth/2,Camera.main.pixelHeight/2,250,40),countdownText,style4);
 	}
 
 }
