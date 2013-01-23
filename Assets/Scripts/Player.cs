@@ -411,5 +411,4 @@ public class Player : MonoBehaviour {
 	public void score(int p) {
 		points += p;
 	}
-	
 }

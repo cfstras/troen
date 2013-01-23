@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject cameraPrefab;
 	
 	public List<Player> players;
+	public List<IO> ios;
 	private Player lastAlivePlayer;
 	
 	//Settings
@@ -58,7 +59,10 @@ public class GameManager : MonoBehaviour {
 			p.manager = this;
 			p.number = i;			
 			p.playerCamera = ((GameObject) Instantiate(cameraPrefab)).camera;
-			players.Add (p);	
+			IO io = new IO("COM3");//TODO: get free COM port
+			io.player = p;
+			ios.Add(io);
+			players.Add(p);	
 		}
 		
 		//create cameras
