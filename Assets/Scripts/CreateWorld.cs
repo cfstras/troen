@@ -17,6 +17,7 @@ public class CreateWorld : MonoBehaviour {
 	int inputSelectedPlayer;
 	int inputSelectedKey;
 	int inputMaxKeys = 5;
+	bool gameAlreadyStarted;
 	
 	//DATA
 	protected bool showGUI = true;
@@ -165,8 +166,15 @@ public class CreateWorld : MonoBehaviour {
 		}
 		
 		ypos += 10;
-		if (GUI.Button(new Rect(410, ypos, 75, 30), "Start") && keyCodes != null && keyCodes.GetLength(0) == playerCount && newPlayerCount>1) {
+		String buttonTxt;
+		if(gameAlreadyStarted) {
+			buttonTxt = "Start Over";
+		} else {
+			buttonTxt = "Start";
+		}
+		if (GUI.Button(new Rect(410, ypos, 75, 30), buttonTxt) && keyCodes != null && keyCodes.GetLength(0) == playerCount && newPlayerCount>1) {
 			showGUI = false;
+			gameAlreadyStarted = true;
 			KeyCode left, right, brake, speed, power;
 			manager.StartGame(playerCount);
 			for(int i=0;i < playerCount; i++) {

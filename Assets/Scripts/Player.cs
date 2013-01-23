@@ -36,7 +36,7 @@ public class Player : MonoBehaviour {
 	
 	private Vector3 nextPosition;
 	
-	public bool alive = true;
+	public bool alive;
 	public bool winner = false;
 	public int points = 0;
 	
@@ -76,17 +76,24 @@ public class Player : MonoBehaviour {
 		} else {
 			head = headTrans.gameObject;
 		}
+		name = "Player "+(number+1).ToString();
+	}
+	
+	/**
+	 * Does everything a player has to do to be in the next round
+	 * position and rotation must be set before calling this!
+	 */
+	public void newRound() {
 		headStartRotation = head.transform.localRotation;
 		SetOrientation();
 		SetColor();
 		AddTail();
-		name = "Player "+(number+1).ToString();
-	}
-	public void newRound() {
+		
 		transform.Find("Head").renderer.enabled = true;
 		collider.enabled = true;
 		collider.isTrigger = true;
-		winner= false;
+		alive = true;
+		winner = false;
 	}
 	
 	// Update is called once per frame
@@ -231,6 +238,7 @@ public class Player : MonoBehaviour {
 		transform.Find("Head").renderer.enabled = false;
 		collider.enabled = false;
 		collider.isTrigger = false;
+		lastTail = null;
 		if(instantly) {
 			foreach (GameObject g in tails) {
 				Destroy (g);
@@ -242,6 +250,13 @@ public class Player : MonoBehaviour {
 			}
 			tails.Clear();
 		}
+	}
+	
+	/**
+	 * Delete this player
+	 */
+	public void Delete() {
+		Destroy(gameObject);
 	}
 	
 	private void AddTail() {

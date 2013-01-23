@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour {
 		foreach (Player p in players)
 		{
 			p.Kill(true);
-			Destroy(p);
+			p.Delete();
 		}
 		players.Clear();
 		
@@ -60,8 +60,24 @@ public class GameManager : MonoBehaviour {
 			players.Add (p);	
 		}
 		
-		//reset positions
+		//create cameras
+		PositionCameras();
+		SetCameraTextPositioningOffsets();
+		PositionPlayerNotifications();
 		
+		//init players
+		foreach (Player p in players) {
+			p.InitializePlayer();	
+		}
+		
+		newRound(false);
+		
+		//freeze time until UnPause()
+		pause = true;
+	}
+	
+	public void newRound(bool startNow) {
+		//reset positions
 		if(numPlayers == 2) {
 			for(int i = 0; i < numPlayers; i++) {
 				players[i].transform.position = new Vector3(
@@ -121,30 +137,19 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 		}
-			
-		//create cameras
-		PositionCameras();
-		
-		SetCameraTextPositioningOffsets();
-		
-		PositionPlayerNotifications();
-		
-		//init players
 		foreach (Player p in players) {
-			p.InitializePlayer();	
+			p.newRound();
 		}
-		
-		//TODO start overlay with countdown
-		
-		//freeze time until UnPause()
-		pause = true;
+		if(startNow) {
+			StartCoroutine(Countdown("GO"));
+		}
 	}
 	
 	/**
 	 * Unpauses the game
 	 */
 	public void UnPause() {
-		StartCoroutine(Countdown());
+		StartCoroutine(Countdown("GO!"));
 	}
 	
 	/**
@@ -154,7 +159,7 @@ public class GameManager : MonoBehaviour {
 		pause = true;
 	}
 	
-	System.Collections.IEnumerator Countdown() {
+	System.Collections.IEnumerator Countdown(string text) {
 		yield return new WaitForSeconds(1);
 		countdownText = "3";
 		yield return new WaitForSeconds(1);
@@ -162,7 +167,7 @@ public class GameManager : MonoBehaviour {
 		yield return new WaitForSeconds(1);
 		countdownText = "1";
 		yield return new WaitForSeconds(1);
-		countdownText = "GO!";
+		countdownText = text;
 		pause = false;
 		yield return new WaitForSeconds(1);
 		countdownText = "";
@@ -204,12 +209,12 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 			//wait five seconds then end game and give winner points
-			
 			StartCoroutine(DoEndGame(last));
 		}
 	}
 	
 	System.Collections.IEnumerator DoEndGame(Player player) {
+		//TODO add some indicator here
 		yield return new WaitForSeconds(5);
 		if(player.alive) {
 			player.winner = true;
@@ -217,6 +222,13 @@ public class GameManager : MonoBehaviour {
 		}
 		pause = true;
 		player.alive = false;
+		yield return new WaitForSeconds(1);
+		countdownText = "PREPARE FOR NEXT ROUND!";
+		foreach(Player p in players) {
+			p.Kill(true);
+		}
+		yield return new WaitForSeconds(2);
+		newRound(true);
 	}
 	
 	void PositionCameras() {
@@ -289,30 +301,31 @@ public class GameManager : MonoBehaviour {
 	void OnGUI(){
 		foreach(Player p in players) {
 			if(p != null) {
-				GUIStyle style1 = new GUIStyle();
-				style1.fontSize = 20;
-				style1.normal.textColor = p.color;
-    			GUI.Label(new Rect(p.textPosX,p.textPosY,250,40),p.name+": "+p.points+" points",style1);
-				if(p.alive == false && !p.winner) {
-					GUIStyle style2 = new GUIStyle();
-					style2.fontSize = 40;
-					style2.normal.textColor = p.color;
+				GUIStyle stylePoints = new GUIStyle();
+				stylePoints.fontSize = 20;
+				stylePoints.normal.textColor = p.color;
+    			GUI.Label(new Rect(p.textPosX,p.textPosY,250,40),p.name+": "+p.points+" points",stylePoints);
+				if(!p.alive && !p.winner) {
+					GUIStyle style = new GUIStyle();
+					style.fontSize = 40;
+					style.normal.textColor = p.color;
 					float ydiff = (numPlayers==2?125:250);
-					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU DIED!",style2);
+					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU DIED!",style);
 				}
-				if(p.winner == true) {
-					GUIStyle style3 = new GUIStyle();
-					style3.fontSize = 40;
-					style3.normal.textColor = p.color;
+				if(!p.alive && p.winner) {
+					GUIStyle style = new GUIStyle();
+					style.fontSize = 40;
+					style.normal.textColor = p.color;
 					float ydiff = (numPlayers==2?125:250);
-					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU WON!",style3);
+					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU WON!",style);
 				}
 			}
 		}
-		GUIStyle style4 = new GUIStyle();
-		style4.fontSize = 50;
-		style4.normal.textColor = Color.white;
-		GUI.Label(new Rect(Camera.main.pixelWidth/2,Camera.main.pixelHeight/2,250,40),countdownText,style4);
+		GUIStyle styleCountdown = new GUIStyle();
+		styleCountdown.fontSize = 50;
+		styleCountdown.normal.textColor = Color.white;
+		styleCountdown.alignment = TextAnchor.MiddleCenter;
+		GUI.Label(new Rect(0,0,Camera.main.pixelWidth,Camera.main.pixelHeight),countdownText,styleCountdown);
 	}
 
 }
