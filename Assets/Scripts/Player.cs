@@ -84,6 +84,7 @@ public class Player : MonoBehaviour {
 	 * position and rotation must be set before calling this!
 	 */
 	public void newRound() {
+		nextPosition = transform.position;
 		headStartRotation = head.transform.localRotation;
 		SetOrientation();
 		SetColor();
@@ -263,7 +264,7 @@ public class Player : MonoBehaviour {
 		UpdateTail(1);
 		
 		lastTail = (GameObject) Instantiate(tailPrefab);
-		lastTail.name = "Tail "+number+" - "+tails.Count;
+		lastTail.name = "Tail "+number+" - "+tails.Count+" - ID: "+Random.value;
 		lastTail.renderer.material.color = Color.Lerp(Color.grey,color,0.8f);
 		lastTailStartPos = transform.position;
 		Tail tail = (Tail)lastTail.GetComponent("Tail");
