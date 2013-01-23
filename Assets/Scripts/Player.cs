@@ -125,7 +125,7 @@ public class Player : MonoBehaviour {
 		
 		//TODO check if collided
 		
-		UpdateTail(1);
+		UpdateTail(7);
 		
 		orientation = newOrientation;
 		transform.position = nextPosition;
