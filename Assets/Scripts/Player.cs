@@ -386,33 +386,30 @@ public class Player : MonoBehaviour {
 			if(otherObject.name.Contains("Player")) {
 				//otherobject is a player
 				otherObject.SendMessage("Kill", false);
-				otherObject.SendMessage("removePoints",1);
-				removePoints(1);
+				otherObject.SendMessage("score",-1);
+				score(-1);
 				Debug.Log(otherObject.name + " and " + name + " destroyed each other");
 			} else if(otherObject.name.Contains("Tail")) {
 				//otherobject is a tail
 				Tail tail = (Tail) otherObject.GetComponent("Tail");	
 				if(name == tail.player.name) {
-					removePoints(2);
+					score(-2);
 					Debug.Log(name + " got destroyed by own tail");
 				} else {
-					tail.player.SendMessage("addPoint");
-					removePoints(1);
+					tail.player.SendMessage("score",-1);
+					score(-1);
 					Debug.Log(name + " got destroyed by tail from " + tail.player.name);
 				}
 			} else if(otherObject.tag == "wall") {
 				//otherobject is a wall
-				removePoints(1);
+				score(-1);
 				Debug.Log(name + " got destroyed by a wall.");	
 			}
 		}
 	}
 	
-	public void addPoint() {
-		points++;
-	}
-	public void removePoints(int p) {
-		points = points - p;
+	public void score(int p) {
+		points += p;
 	}
 	
 }

@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject cameraPrefab;
 	
 	public List<Player> players;
+	private Player lastAlivePlayer;
 	
 	//Settings
 	public int numPlayers = 0;
@@ -78,6 +79,7 @@ public class GameManager : MonoBehaviour {
 	
 	public void newRound(bool startNow) {
 		//reset positions
+		lastAlivePlayer = null;
 		if(numPlayers == 2) {
 			for(int i = 0; i < numPlayers; i++) {
 				players[i].transform.position = new Vector3(
@@ -200,28 +202,29 @@ public class GameManager : MonoBehaviour {
 				aliveCount++;
 			}
 		}
-		if(aliveCount == 1) {
+		if(aliveCount <= 1 && lastAlivePlayer == null) {
 			// get last alive player
-			Player last = null;
+			lastAlivePlayer = null;
 			foreach (Player p in players) {
 				if(p.alive) {
-					last = p;
+					lastAlivePlayer = p;
 				}
 			}
 			//wait five seconds then end game and give winner points
-			StartCoroutine(DoEndGame(last));
+			StartCoroutine(DoEndGame(lastAlivePlayer));
 		}
 	}
 	
 	System.Collections.IEnumerator DoEndGame(Player player) {
 		//TODO add some indicator here
 		yield return new WaitForSeconds(5);
-		if(player.alive) {
+		
+		if(player != null && player.alive) {
 			player.winner = true;
-			player.addPoint();
+			player.score(2*numPlayers);
+			player.alive = false;
 		}
 		pause = true;
-		player.alive = false;
 		yield return new WaitForSeconds(1);
 		countdownText = "PREPARE FOR NEXT ROUND!";
 		foreach(Player p in players) {
