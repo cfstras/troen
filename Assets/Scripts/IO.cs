@@ -22,17 +22,24 @@ public class IO {
 	public int slider1,slider2,valve1,valve2;
 	public float s1,s2,v1,v2;
 	
+	public bool leftDown;
+	public bool rightDown;
+	public float leftDownLast;
+	public float rightDownLast;
+	public float jumpLast;
+	public static float buttonTime = 1/10.0f;
+	
 	public IO(string port){
 		stream = new SerialPort(port);
 		stream.Open(); //Open the Serial Stream.	
-		Debug.Log("Serial Port opened.");	
+		Debug.Log("Serial Port "+port+" opened.");	
 	}
 	// Use this for initialization
 	void Start () {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void Update () {
 		//buttons
 		stream.Write("1");
 		receivedData = stream.ReadLine();
@@ -55,26 +62,47 @@ public class IO {
 		receivedData = stream.ReadLine();
 		//A: 0000 0000 0000 0000
 		//A: dreh dreh slid1 slid2
-		string[] dataS = receivedData.Split(' ');
+		data = receivedData.Split(' ');
 		slider1 = System.Convert.ToInt32(data[3],16);
 		slider2 = System.Convert.ToInt32(data[4],16);
 		valve1 = System.Convert.ToInt32(data[1],16);
 		valve2 = System.Convert.ToInt32(data[2],16);
 		//convert to [0,1]
-		int b = 4095;
-		s1 = (float)slider1/b;
-		s2 = (float)slider2/b;
-		v1 = (float)valve1/b;
-		v2 = (float)valve2/b;
+		float b = 4095;
+		s1 = slider1/b;
+		s2 = slider2/b;
+		v1 = valve1/b;
+		v2 = valve2/b;
+		
+		player.accel = interpolate(s1,0,1,-0.5f,1.5f);
+		
 		//input evens to player
 		if ((buttonVal & leftButtonMask) != 0) {
-			player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Direction, -1));
-			Debug.Log("left.");
-		} 
-		if((buttonVal & rightButtonMask) != 0) {
-			player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Direction, 1));
-			Debug.Log("right.");
+			if(!leftDown && leftDownLast+buttonTime < Time.time) {
+				leftDownLast = Time.time;
+				player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Direction, -1));
+				Debug.Log("left.");
+			}
+			leftDown = true;
+		} else {
+			leftDown = false;
 		}
+		if((buttonVal & rightButtonMask) != 0) {
+			if(!rightDown && leftDownLast+buttonTime < Time.time) {
+				rightDownLast = Time.time;
+				player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Direction, 1));
+				Debug.Log("right.");
+			}
+			rightDown = true;
+		} else {
+			rightDown = false;
+		}
+		if(fz <= -0.5f && jumpLast + buttonTime < Time.time) {
+			jumpLast = Time.time;
+			player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Powerup, 1));
+			Debug.Log("jump");
+		}
+		
 	}
 	
 	int convertInt(int i) {

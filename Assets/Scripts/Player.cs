@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
 	//constants
 	public static float playerHeight = 0.0625f;
 	public const float turnDeadZone = 0.05f;
-	public static float playerSpeed = 2.0f;
+	public static float playerSpeed = 0.8f;
 	public const float headTurnSpeed = 1.0f;
 	public static float tailBeginOffset = 0.5f;
 	
@@ -33,6 +33,11 @@ public class Player : MonoBehaviour {
 	public Orientation orientation;
 	public Orientation newOrientation;
 	float speed;
+	static float maxPlayerSpeed = 4;
+	public float accel = 1;
+	private float jumpingAccel;
+	private float jumpingYPos;
+	private float jumpingBaseY;
 	
 	private Vector3 nextPosition;
 	
@@ -98,6 +103,10 @@ public class Player : MonoBehaviour {
 		collider.isTrigger = true;
 		alive = true;
 		winner = false;
+		speed = playerSpeed;
+		jumpingYPos = transform.position.y;
+		jumpingAccel = 0;
+		jumpingBaseY = transform.position.y;
 	}
 	
 	// Update is called once per frame
@@ -105,9 +114,18 @@ public class Player : MonoBehaviour {
 		if(manager.pause || !alive) {
 			return;
 		}
-		
+		if(io != null) {
+			io.Update();
+		}
 		DoInput();
-		//TODO accelerate to normal speed
+		
+		//accelerate to normal speed
+		float speedOld = speed;
+		speed += accel * Time.deltaTime;
+		if(speed >= maxPlayerSpeed) {
+			speed = maxPlayerSpeed;
+		}
+		
 		//TODO accelerate faster if next to wall
 		
 		//turn head
@@ -120,7 +138,22 @@ public class Player : MonoBehaviour {
 		//head.transform.localRotation = Quaternion.Slerp(headFromRotation,headStartRotation,headTurnValue);
 		
 		//update position
-		nextPosition = transform.position + OrientationToVector(orientation) * speed * Time.deltaTime;
+		
+		nextPosition = transform.position + OrientationToVector(orientation) *
+			((speed + speedOld ) * 0.5f * Time.deltaTime);
+		nextPosition.y = jumpingBaseY;
+		
+		//jump
+		float oldAcc = jumpingAccel;
+		jumpingAccel -= 9.81f*Time.deltaTime;
+		if(jumpingAccel < -3.5f) {
+			jumpingAccel = -3.5f;
+		}
+		jumpingYPos += ((jumpingAccel + oldAcc ) * 0.5f * Time.deltaTime);
+		if(jumpingYPos < jumpingBaseY) {
+			jumpingAccel = 0;
+			jumpingYPos = jumpingBaseY;
+		}
 		
 		if(waitingToTurn!=0) {
 			Turn();
@@ -129,7 +162,7 @@ public class Player : MonoBehaviour {
 		//TODO check if collided
 		
 		UpdateTail(7);
-		
+		nextPosition.y = jumpingYPos;
 		orientation = newOrientation;
 		transform.position = nextPosition;
 	}
@@ -227,6 +260,10 @@ public class Player : MonoBehaviour {
 	
 	private void Powerup(float val) {
 		//TODO powerup
+		if(val >= 0.9f) {
+			jumpingAccel = 4.0f;
+			Debug.Log("Player "+number+" jumps high.");
+		}
 	}
 	
 	public void SetOrientation() {
@@ -238,6 +275,9 @@ public class Player : MonoBehaviour {
 	 * if instantly is true, the walls won't fall down but vanish now
 	 */
 	public void Kill(bool instantly) {
+		if(!alive) {
+			return;
+		}
 		alive = false;
 		transform.Find("Head").renderer.enabled = false;
 		collider.enabled = false;
@@ -250,7 +290,9 @@ public class Player : MonoBehaviour {
 			tails.Clear();
 		} else {
 			foreach(GameObject g in tails) {
-				g.SendMessage("FallDown");
+				if(g.active) {
+					g.SendMessage("FallDown");
+				}
 			}
 			tails.Clear();
 		}
@@ -270,7 +312,7 @@ public class Player : MonoBehaviour {
 		lastTail = (GameObject) Instantiate(tailPrefab);
 		lastTail.name = "Tail "+number+" - "+tails.Count+" - ID: "+Random.value;
 		lastTail.renderer.material.color = Color.Lerp(Color.grey,color,0.8f);
-		lastTailStartPos = transform.position;
+		lastTailStartPos = new Vector3(nextPosition.x,jumpingBaseY,nextPosition.z);
 		Tail tail = (Tail)lastTail.GetComponent("Tail");
 		tail.player = gameObject;
 		tails.Add(lastTail);
@@ -398,10 +440,10 @@ public class Player : MonoBehaviour {
 				//otherobject is a tail
 				Tail tail = (Tail) otherObject.GetComponent("Tail");	
 				if(name == tail.player.name) {
-					score(-2);
+					score(-1);
 					Debug.Log(name + " got destroyed by own tail");
 				} else {
-					tail.player.SendMessage("score",-1);
+					tail.player.SendMessage("score",1);
 					score(-1);
 					Debug.Log(name + " got destroyed by tail from " + tail.player.name);
 				}
@@ -414,9 +456,11 @@ public class Player : MonoBehaviour {
 	}
 	
 	public void SetCOM(string port) {
-		this.comPort = port;
-		io = new IO(comPort);
-		io.player = this;
+		if(port != null && !port.Equals("")) {
+			this.comPort = port;
+			io = new IO(comPort);
+			io.player = this;
+		}
 	}
 	
 	public void score(int p) {

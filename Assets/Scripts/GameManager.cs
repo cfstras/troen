@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour {
 	public GameObject cameraPrefab;
 	
 	public List<Player> players;
-	public List<IO> ios;
 	private Player lastAlivePlayer;
 	
 	//Settings
@@ -18,6 +17,7 @@ public class GameManager : MonoBehaviour {
 	
 	//Variables
 	public bool pause = true;
+	public bool gameEnding = false;
 	
 	public float offsetX, offsetY;
 	
@@ -59,9 +59,6 @@ public class GameManager : MonoBehaviour {
 			p.manager = this;
 			p.number = i;			
 			p.playerCamera = ((GameObject) Instantiate(cameraPrefab)).camera;
-			IO io = new IO("COM3");//TODO: get free COM port
-			io.player = p;
-			ios.Add(io);
 			players.Add(p);	
 		}
 		
@@ -84,6 +81,7 @@ public class GameManager : MonoBehaviour {
 	public void newRound(bool startNow) {
 		//reset positions
 		lastAlivePlayer = null;
+		gameEnding = false;
 		if(numPlayers == 2) {
 			for(int i = 0; i < numPlayers; i++) {
 				players[i].transform.position = new Vector3(
@@ -206,9 +204,12 @@ public class GameManager : MonoBehaviour {
 				aliveCount++;
 			}
 		}
-		if(aliveCount <= 1 && lastAlivePlayer == null) {
+		
+		if(aliveCount <= 1 && lastAlivePlayer == null && !gameEnding) {
 			// get last alive player
 			lastAlivePlayer = null;
+			Debug.Log ("Ending game, "+aliveCount+" players left.");
+			gameEnding = true;
 			foreach (Player p in players) {
 				if(p.alive) {
 					lastAlivePlayer = p;
@@ -233,6 +234,11 @@ public class GameManager : MonoBehaviour {
 		countdownText = "PREPARE FOR NEXT ROUND!";
 		foreach(Player p in players) {
 			p.Kill(true);
+		}
+		
+		GameObject[] tails = GameObject.FindGameObjectsWithTag("tail");
+		foreach (GameObject tail in tails) {
+			Destroy(tail);
 		}
 		yield return new WaitForSeconds(2);
 		newRound(true);

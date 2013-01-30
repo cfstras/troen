@@ -26,7 +26,7 @@ public class CreateWorld : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		windowRect = new Rect(Camera.main.pixelWidth/2-250, Camera.main.pixelHeight/2-250, 500, 500);
+		windowRect = new Rect(Camera.main.pixelWidth/2-250, Camera.main.pixelHeight/2-250, 575, 500);
 		playerCountField = "2";
 		Debug.Log("CreateWorld Start()");
 		inputSelectedPlayer = -1;
@@ -109,8 +109,11 @@ public class CreateWorld : MonoBehaviour {
 			DefaultKeys();
 		}
 		
-		if(comPorts == null && comPorts.Length != playerCount) {
+		if(comPorts == null || comPorts.Length != playerCount) {
 			comPorts = new string[playerCount];
+			for(int i=0; i<playerCount;i++) {
+				comPorts[i] = "";
+			}
 		}
 		
 		// set inputs for each player
@@ -130,8 +133,9 @@ public class CreateWorld : MonoBehaviour {
 				GUI.Label(new Rect(xpos,ypos,xsize,20),"    Speed");
 				xpos += xsize + dist;
 				GUI.Label(new Rect(xpos,ypos,xsize,20),"   Powerup");
-				ypos += 25;
+				xpos += xsize + dist;
 				GUI.Label(new Rect(xpos,ypos,xsize,20),"   COMPort");
+				ypos += 25;
 				ypos += 25;
 				xpos = 70;
 			}
@@ -160,7 +164,7 @@ public class CreateWorld : MonoBehaviour {
 			}
 			
 			xpos += xsize+dist;
-			comPorts[i] = GUI.TextField(new Rect(xpos, ypos, xsize, 25),comPorts[i]);
+			comPorts[i] = GUI.TextField(new Rect(xpos, ypos, xsize, 25),comPorts[i],4);
 			
 			ypos += 30;
 		}
