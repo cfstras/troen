@@ -13,6 +13,7 @@ public class CreateWorld : MonoBehaviour {
 	private Rect windowRect;
 	
 	KeyCode[,] keyCodes;
+	string[] comPorts;
 	string playerCountField = "2";
 	int inputSelectedPlayer;
 	int inputSelectedKey;
@@ -108,6 +109,10 @@ public class CreateWorld : MonoBehaviour {
 			DefaultKeys();
 		}
 		
+		if(comPorts == null && comPorts.Length != playerCount) {
+			comPorts = new string[playerCount];
+		}
+		
 		// set inputs for each player
 		
 		for(int i = 0; i < playerCount; i++) {
@@ -125,6 +130,8 @@ public class CreateWorld : MonoBehaviour {
 				GUI.Label(new Rect(xpos,ypos,xsize,20),"    Speed");
 				xpos += xsize + dist;
 				GUI.Label(new Rect(xpos,ypos,xsize,20),"   Powerup");
+				ypos += 25;
+				GUI.Label(new Rect(xpos,ypos,xsize,20),"   COMPort");
 				ypos += 25;
 				xpos = 70;
 			}
@@ -151,6 +158,9 @@ public class CreateWorld : MonoBehaviour {
 			if(GUI.Button(new Rect(xpos, ypos, xsize, 25),Enum.GetName(typeof(KeyCode),keyCodes[i,4]))) {
 				inputSelectedPlayer = i; inputSelectedKey = 4;
 			}
+			
+			xpos += xsize+dist;
+			comPorts[i] = GUI.TextField(new Rect(xpos, ypos, xsize, 25),comPorts[i]);
 			
 			ypos += 30;
 		}
@@ -184,6 +194,7 @@ public class CreateWorld : MonoBehaviour {
 				speed = keyCodes[i,3];
 				power = keyCodes[i,4];
 				manager.players[i].SetKeyCodes(left,right,brake,speed,power);
+				manager.players[i].SetCOM(comPorts[i]);
 			}
 			manager.UnPause();
 		}

@@ -43,6 +43,9 @@ public class Player : MonoBehaviour {
 	// Keyconfig
 	public KeyCode[] keyCodes;
 	
+	private string comPort;
+	private IO io;
+	
 	//Camera
 	public Camera playerCamera;
 	
@@ -258,6 +261,7 @@ public class Player : MonoBehaviour {
 	 */
 	public void Delete() {
 		Destroy(gameObject);
+		io = null;
 	}
 	
 	private void AddTail() {
@@ -407,6 +411,12 @@ public class Player : MonoBehaviour {
 				Debug.Log(name + " got destroyed by a wall.");	
 			}
 		}
+	}
+	
+	public void SetCOM(string port) {
+		this.comPort = port;
+		io = new IO(comPort);
+		io.player = this;
 	}
 	
 	public void score(int p) {

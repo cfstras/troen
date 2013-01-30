@@ -6,7 +6,6 @@ using System;
 public class IO {
 	SerialPort stream = null;
 	public string receivedData = "EMPTY";
-	static BeagleBoardIO instance;
 	public Player player;
 	
 	//buttons
@@ -63,7 +62,7 @@ public class IO {
 		return i;
 	}
 	
-	float interpolate(int value,int froma,int fromb, int toa,int tob) {
-		return 1 - (value-froma)*(tob-toa)/(float)(fromb-froma);
+	float interpolate(float value, float froma, float fromb, float toa, float tob) {
+		return 1 - (value-froma)*(tob-toa)/(fromb-froma);
 	}
 }
