@@ -1,12 +1,14 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.IO.Ports;
 
 public class CreateWorld : MonoBehaviour {
 	
 	//GAME
 	public GameManager manager;
 	protected GameObject planeFloor, planeLeft, planeRight, planeFront, planeBack;
+	protected GameObject planeFloorr, planeFloorf, planeFloorl, planeFloorb;
 	public GameObject prefabPlane;
 	
 	//GUI
@@ -55,11 +57,21 @@ public class CreateWorld : MonoBehaviour {
 		planeFront 	= (GameObject) Instantiate(prefabPlane);
 		planeBack  	= (GameObject) Instantiate(prefabPlane);
 		
+		planeFloorl  = (GameObject) Instantiate(prefabPlane);
+		planeFloorr  = (GameObject) Instantiate(prefabPlane);
+		planeFloorf  = (GameObject) Instantiate(prefabPlane);
+		planeFloorb  = (GameObject) Instantiate(prefabPlane);
+		
 		planeFloor.name = "planeFloor";
 		planeLeft.name = "planeLeft";
 		planeRight.name = "planeRight";
 		planeFront.name = "planeFront";
 		planeBack.name = "planeBack";
+		
+		planeFloorr.name = "planeFloorr";
+		planeFloorl.name = "planeFloorl";
+		planeFloorf.name = "planeFloorf";
+		planeFloorb.name = "planeFloorb";
 		
 		planeBack.transform.rotation = Quaternion.Euler(90,0,0);
 		planeFront.transform.rotation = Quaternion.Euler(-90,0,0);
@@ -71,8 +83,19 @@ public class CreateWorld : MonoBehaviour {
 		planeLeft.transform.position = new Vector3(5,0,0);
 		planeRight.transform.position = new Vector3(-5,0,0);
 		planeFloor.transform.position = new Vector3(0,-5,0);
+		
+		planeFloorr.transform.position = new Vector3(10,-5,0);
+		planeFloorl.transform.position = new Vector3(-10,-5,0);
+		planeFloorf.transform.position = new Vector3(0,-5,10);
+		planeFloorb.transform.position = new Vector3(0,-5,-10);
+		
 		//disable collison for floor
 		planeFloor.collider.enabled = false;
+		
+		planeFloorr.collider.enabled = false;
+		planeFloorl.collider.enabled = false;
+		planeFloorf.collider.enabled = false;
+		planeFloorb.collider.enabled = false;
 	}
 	
 	void OnGUI () {
@@ -178,8 +201,13 @@ public class CreateWorld : MonoBehaviour {
 			e.Use();
 			inputSelectedPlayer = -1; inputSelectedKey = -1;
 		}
-		
 		ypos += 10;
+		string[] names = SerialPort.GetPortNames();
+		foreach(string name in names) {
+			GUI.Label(new Rect(50,ypos,100,20),name);
+			ypos += 10;
+		}
+		
 		String buttonTxt;
 		if(gameAlreadyStarted) {
 			buttonTxt = "Start Over";

@@ -274,21 +274,21 @@ public class GameManager : MonoBehaviour {
 				break;
 			case 3:
 				players[0].textPosX = 0;
-				players[0].textPosY = 0;
+				players[2].textPosY = 0;
 				players[1].textPosX = 0;
 				players[1].textPosY = Camera.main.pixelHeight/2;
 				players[2].textPosX = Camera.main.pixelWidth/2;
-				players[2].textPosY = Camera.main.pixelHeight/2;
+				players[0].textPosY = Camera.main.pixelHeight/2;
 				break;
 			case 4:
 				players[0].textPosX = 0;
-				players[0].textPosY = 0;
+				players[2].textPosY = 0;
 				players[1].textPosX = Camera.main.pixelWidth/2;
-				players[1].textPosY = 0;
+				players[3].textPosY = 0;
 				players[2].textPosX = 0;
-				players[2].textPosY = Camera.main.pixelHeight/2;
+				players[0].textPosY = Camera.main.pixelHeight/2;
 				players[3].textPosX = Camera.main.pixelWidth/2;
-				players[3].textPosY = Camera.main.pixelHeight/2;
+				players[1].textPosY = Camera.main.pixelHeight/2;
 				break;
 		}
 		Debug.Log("offsetX: " + offsetX + " offsetY: " + offsetY);
