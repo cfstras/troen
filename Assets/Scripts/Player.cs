@@ -455,12 +455,9 @@ public class Player : MonoBehaviour {
 		}
 	}
 	
-	public void SetCOM(string port) {
-		if(port != null && !port.Equals("")) {
-			this.comPort = port;
-			io = new IO(comPort);
+	public void SetIO() {
+			io = new IO();
 			io.player = this;
-		}
 	}
 	
 	public void score(int p) {

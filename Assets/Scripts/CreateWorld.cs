@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System;
-using System.IO.Ports;
 
 public class CreateWorld : MonoBehaviour {
 	
@@ -202,11 +201,6 @@ public class CreateWorld : MonoBehaviour {
 			inputSelectedPlayer = -1; inputSelectedKey = -1;
 		}
 		ypos += 10;
-		string[] names = SerialPort.GetPortNames();
-		foreach(string name in names) {
-			GUI.Label(new Rect(50,ypos,100,20),name);
-			ypos += 10;
-		}
 		
 		String buttonTxt;
 		if(gameAlreadyStarted) {
@@ -226,7 +220,7 @@ public class CreateWorld : MonoBehaviour {
 				speed = keyCodes[i,3];
 				power = keyCodes[i,4];
 				manager.players[i].SetKeyCodes(left,right,brake,speed,power);
-				manager.players[i].SetCOM(comPorts[i]);
+				manager.players[i].SetIO();
 			}
 			manager.UnPause();
 		}
