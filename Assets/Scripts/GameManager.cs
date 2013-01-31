@@ -269,15 +269,17 @@ public class GameManager : MonoBehaviour {
 					GUIStyle style = new GUIStyle();
 					style.fontSize = 40;
 					style.normal.textColor = p.color;
+					style.alignment = TextAnchor.MiddleCenter;
 					float ydiff = (numPlayers==2?125:250);
-					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU DIED!",style);
+					GUI.Label(new Rect(0,0,Camera.main.pixelWidth,Camera.main.pixelHeight),"YOU DIED!",style);
 				}
 				if(!p.alive && p.winner) {
 					GUIStyle style = new GUIStyle();
-					style.fontSize = 40;
+					style.fontSize = 50;
 					style.normal.textColor = p.color;
+					style.alignment = TextAnchor.MiddleCenter;
 					float ydiff = (numPlayers==2?125:250);
-					GUI.Label(new Rect(p.textPosX+offsetX-125,p.textPosY+offsetY-ydiff,250,250),"YOU WON!",style);
+					GUI.Label(new Rect(0,0,Camera.main.pixelWidth,Camera.main.pixelHeight),"YOU WON!",style);
 				}
 			}
 		}
