@@ -25,18 +25,14 @@ public class IO {
 	// Update is called once per frame
 	public void Update () {
 		//get accelerometer data
-		dir.x = -Input.acceleration.y;
-		dir.y = Input.acceleration.z;
-		dir.z = Input.acceleration.x;
-		
-		// clamp acceleration vector to the unit sphere
-		if (dir.sqrMagnitude > 1)
-			dir.Normalize();
+		dir.x = Input.acceleration.x;
+		dir.y = Input.acceleration.y;
+		dir.z = Input.acceleration.z;
 		
 		player.accel = 1.0f;
 		
 		//input evens to player
-		if (dir.y >= 0.5f) {
+		if (dir.y >= 0.6f) {
 			if(!leftDown && leftDownLast+buttonTime < Time.time) {
 				leftDownLast = Time.time;
 				player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Direction, -1));
@@ -46,8 +42,8 @@ public class IO {
 		} else {
 			leftDown = false;
 		}
-		if(dir.y <= -0.5f) {
-			if(!rightDown && leftDownLast+buttonTime < Time.time) {
+		if(dir.y <= -0.6f) {
+			if(!rightDown && rightDownLast+buttonTime < Time.time) {
 				rightDownLast = Time.time;
 				player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Direction, 1));
 				Debug.Log("right.");
@@ -57,7 +53,7 @@ public class IO {
 			rightDown = false;
 		}
 		//jump
-		if(dir.y >= 0.5f && jumpLast + buttonTime < Time.time) {
+		if(dir.z >= 0.5f && jumpLast + buttonTime < Time.time) {
 			jumpLast = Time.time;
 			player.inputEvents.AddLast(new InputEvent(InputEvent.Axis.Powerup, 1));
 			Debug.Log("jump");

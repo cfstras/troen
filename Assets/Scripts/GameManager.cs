@@ -39,8 +39,8 @@ public class GameManager : MonoBehaviour {
 			p.Delete();
 		}
 		players.Clear();
-		
-		
+		//dont dimm the screen
+		Screen.sleepTimeout = SleepTimeout.NeverSleep;	
 	}
 	
 	/**
@@ -245,70 +245,17 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	void PositionCameras() {
-		switch(numPlayers) {
-			case 2:
-				players[0].playerCamera.rect = new Rect(  0,0,0.5f,1);
-				players[1].playerCamera.rect = new Rect(0.5f,0,0.5f,1);
-				break;
-			case 3:
-				players[0].playerCamera.rect = new Rect(0,    0,0.5f,0.5f);
-				players[1].playerCamera.rect = new Rect(0.5f,  0,0.5f,0.5f);
-				players[2].playerCamera.rect = new Rect(0,  0.5f,0.5f,0.5f);
-				break;
-			case 4:
-				players[0].playerCamera.rect = new Rect(0,    0,0.5f,0.5f);
-				players[1].playerCamera.rect = new Rect(0.5f,  0,0.5f,0.5f);
-				players[2].playerCamera.rect = new Rect(0,  0.5f,0.5f,0.5f);
-				players[3].playerCamera.rect = new Rect(0.5f,0.5f,0.5f,0.5f);
-				break;
-		}
+				players[0].playerCamera.rect = new Rect(0,0,1,1);
 	}
 	
 	void PositionPlayerNotifications() {
-		switch(numPlayers) {
-			case 2:
 				players[0].textPosX = 0;
 				players[0].textPosY = 0;
-				players[1].textPosX = Camera.main.pixelWidth/2;
-				players[1].textPosY = 0;
-				break;
-			case 3:
-				players[0].textPosX = 0;
-				players[2].textPosY = 0;
-				players[1].textPosX = 0;
-				players[1].textPosY = Camera.main.pixelHeight/2;
-				players[2].textPosX = Camera.main.pixelWidth/2;
-				players[0].textPosY = Camera.main.pixelHeight/2;
-				break;
-			case 4:
-				players[0].textPosX = 0;
-				players[2].textPosY = 0;
-				players[1].textPosX = Camera.main.pixelWidth/2;
-				players[3].textPosY = 0;
-				players[2].textPosX = 0;
-				players[0].textPosY = Camera.main.pixelHeight/2;
-				players[3].textPosX = Camera.main.pixelWidth/2;
-				players[1].textPosY = Camera.main.pixelHeight/2;
-				break;
-		}
-		Debug.Log("offsetX: " + offsetX + " offsetY: " + offsetY);
 	}
 	
 	void SetCameraTextPositioningOffsets() {
-		switch(numPlayers) {
-			case 2:
-				offsetX = Camera.main.pixelWidth/4;
-				offsetY = Camera.main.pixelHeight/2;
-				break;
-			case 3:
-				offsetX = Camera.main.pixelWidth/4;
-				offsetY = Camera.main.pixelWidth/4;
-				break;
-			case 4:
-				offsetX = Camera.main.pixelWidth/4;
-				offsetY = Camera.main.pixelWidth/4;
-				break;
-		}
+				offsetX = 0;
+				offsetY = 0;
 	}
 	
 	void OnGUI(){
